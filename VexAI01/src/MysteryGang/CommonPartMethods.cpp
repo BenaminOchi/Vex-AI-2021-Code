@@ -104,8 +104,8 @@ namespace Cpm {
     leftMotorSpeed = 150;
     rightMotorSpeed = 150;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
     
