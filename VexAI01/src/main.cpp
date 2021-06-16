@@ -114,7 +114,7 @@ void enterAutonomous(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-void enterUsercontrol(void) {
+void enterUserControl(void) {
   ManualMode::enterManualControl();
 }
 
@@ -141,6 +141,7 @@ int main() {
   thread t2(IsolationMode::isolationModeTask);
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);
+  //enterUserControl();
   //driveForward();
 
   // Prevent main from exiting with an infinite loop.
