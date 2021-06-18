@@ -95,6 +95,8 @@ namespace IsolationMode {
   int isolationModeTask() {
     
     Cpm::stopAllMotors();
+    
+    Cpm::turnRobotLeft(90);
 
     // Enter the main control loop
     while (true) {

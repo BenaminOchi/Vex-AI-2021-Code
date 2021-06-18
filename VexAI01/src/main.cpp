@@ -1,4 +1,10 @@
 #include "vex.h"
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// BumperC              bumper        C               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 #include "MysteryGang/AutonMode.h"
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/CurConfig.h"
