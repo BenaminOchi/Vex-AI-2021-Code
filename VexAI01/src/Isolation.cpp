@@ -96,7 +96,25 @@ namespace IsolationMode {
     
     Cpm::stopAllMotors();
     
-    Cpm::turnRobotLeft(90);
+    Cpm::moveRobotForwardTime(500);
+    Cpm::moveRobotBackwardTime(500);
+    Cpm::turnRobotLeft(2000);
+    Cpm::turnRobotRight(2000);
+    Cpm::startAllIntakes();
+    vex::task::sleep(500);
+    Cpm::stopAllIntakes();
+    vex::task::sleep(1000);
+    Cpm::startBottomIntakes();
+    vex::task::sleep(500);
+    Cpm::stopBottomIntakes();
+    vex::task::sleep(1000);
+    Cpm::startMiddleIntake();
+    vex::task::sleep(500);
+    Cpm::stopMiddleIntake();
+    vex::task::sleep(1000);
+    Cpm::startTopIntakes();
+    vex::task::sleep(500);
+    Cpm::stopTopIntakes();
 
     // Enter the main control loop
     while (true) {

@@ -56,13 +56,30 @@ namespace Cpm {
   // Stop the robot's wheels
   void stopWheels();
 
+  void moveRobotBackwardTime(unsigned int numMillisecs);
   // Turn the robot to the left for the specified motor rotations
   // Rotations in degrees must be negative
-  void turnRobotLeft(int rotationsInDegrees);
+  void turnRobotLeft(unsigned int numMillisecs);
 
   // Turn the robot to the right for the specified motor rotations
   // Rotations in degrees must be positive
-  void turnRobotRight(int rotationsInDegrees);
-}
+  void turnRobotRight(unsigned int numMillisecs);
 
+  void startAllIntakes();
+
+  void stopAllIntakes();
+
+  void startBottomIntakes();
+
+  void stopBottomIntakes();
+
+  void startMiddleIntake();
+
+  void stopMiddleIntake();
+
+  void startTopIntakes();
+
+  void stopTopIntakes();
+
+}
 #endif

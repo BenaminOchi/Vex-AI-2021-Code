@@ -96,22 +96,6 @@ namespace Cpm {
     stopWheels();
   }
 
-  void moveRobotForwardTime(unsigned int numMillisecs) {
-    // Move forward
-    int leftMotorSpeed;
-    int rightMotorSpeed;
-
-    leftMotorSpeed = 150;
-    rightMotorSpeed = 150;
-    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
-    vex::task::sleep(numMillisecs);
-    
-    stopWheels();
-  }
-
   void moveRobotForwardAndIntake(int rotationsInDegrees) {
     // Move forward and intake cubes
     hwEncoderWheels.setPosition(0, degrees);
@@ -171,12 +155,43 @@ namespace Cpm {
     hwMotorWheelBackRight.stop();
   }
 
-  void turnRobotLeft(int rotationsInDegrees) {
+  void moveRobotForwardTime(unsigned int numMillisecs) {
+    // Move forward
+    int leftMotorSpeed;
+    int rightMotorSpeed;
+
+    leftMotorSpeed = 70;
+    rightMotorSpeed = 70;
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    vex::task::sleep(numMillisecs);
+    
+    stopWheels();
+  }
+
+  void moveRobotBackwardTime(unsigned int numMillisecs) {
+    // Move forward
+    int leftMotorSpeed;
+    int rightMotorSpeed;
+
+    leftMotorSpeed = 70;
+    rightMotorSpeed = 70;
+    hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
+    vex::task::sleep(numMillisecs);
+    
+    stopWheels();
+  }
+
+  void turnRobotLeft(unsigned int numMillisecs) {
     // Turn left
     //hwMotorWheelFrontLeft.resetPosition();
     //hwMotorWheelBackLeft.resetPosition();
 
-    int numMillisecs = 2000;
     int leftMotorSpeed = 10;
     int rightMotorSpeed = 10;
     hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
@@ -190,15 +205,62 @@ namespace Cpm {
     stopWheels();
   }
 
-  void turnRobotRight(int rotationsInDegrees) {
+  void turnRobotRight(unsigned int numMillisecs) {
     // Turn right
-    hwEncoderWheels.setPosition(0, degrees);
-    hwMotorWheelBackLeft.spin(forward);
-    hwMotorWheelBackRight.spin(reverse);
-    hwMotorWheelFrontLeft.spin(forward);
-    hwMotorWheelFrontRight.spin(reverse);
-    while (hwEncoderWheels.position(degrees) < rotationsInDegrees) {
-    }
+    int leftMotorSpeed = 10;
+    int rightMotorSpeed = 10;
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
+    vex::task::sleep(numMillisecs);
+
     stopWheels();
+  }
+
+  void startAllIntakes() {
+    int motorSpeed = 150;
+    hwMotorIntakeLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeLifter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+  }
+
+  void stopAllIntakes() {
+    hwMotorIntakeLeft.stop();
+    hwMotorIntakeRight.stop();
+    hwMotorIntakeLifter.stop();
+    hwMotorPusher.stop();
+  }
+
+  void startBottomIntakes() {
+    int motorSpeed = 150;
+    hwMotorIntakeLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+  }
+
+  void stopBottomIntakes() {
+    hwMotorIntakeLeft.stop();
+    hwMotorIntakeRight.stop();
+  }
+
+  void startMiddleIntake() {
+    int motorSpeed = 150;
+    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
+  }
+
+  void stopMiddleIntake() {
+    hwMotorPusher.stop();
+  }
+
+  void startTopIntakes() {
+    int motorSpeed = 150;
+    hwMotorIntakeLifter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+  }
+
+  void stopTopIntakes() {
+    hwMotorIntakeLifter.stop();
+    hwMotorPusher.stop();
   }
 }
