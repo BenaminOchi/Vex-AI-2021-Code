@@ -29,7 +29,7 @@ namespace Cpm {
   void moveRobotForwardEncoders(int ForwardTime);
 
   // Move the robot forwards for the specified amount of time
-  void moveRobotForwardTime(unsigned int numMillisecs);
+  void moveRobotForward(unsigned int numInches);
 
   // Move the robot forwards for the specified motor rotations and move treads to pull in cubes at the same time
   void moveRobotForwardAndIntake(int rotationsInDegrees);
@@ -56,14 +56,14 @@ namespace Cpm {
   // Stop the robot's wheels
   void stopWheels();
 
-  void moveRobotBackwardTime(unsigned int numMillisecs);
+  void moveRobotBackward(unsigned int numInches);
   // Turn the robot to the left for the specified motor rotations
   // Rotations in degrees must be negative
-  void turnRobotLeft(unsigned int numMillisecs);
+  void turnRobotLeft(unsigned int numDegrees);
 
   // Turn the robot to the right for the specified motor rotations
   // Rotations in degrees must be positive
-  void turnRobotRight(unsigned int numMillisecs);
+  void turnRobotRight(unsigned int numDegrees);
 
   void startAllIntakes();
 

@@ -16,4 +16,5 @@ vex::motor       hwMotorIntakeRight     = vex::motor(PORT17, ratio18_1, true);
 vex::motor       hwMotorIntakeLifter    = vex::motor(PORT18, ratio18_1, true);
 vex::motor       hwMotorPusher          = vex::motor(PORT19, ratio18_1, true);
 
-extern bumper BumperC;
+//extern bumper BumperC;
+//limit LimitSwitchD = limit(Brain.ThreeWirePort.D);

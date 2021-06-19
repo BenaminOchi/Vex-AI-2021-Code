@@ -61,7 +61,7 @@ namespace AutonAlliUnpro04 {
     vex::task::sleep(200);
 
     // Straighten out the stack
-    Cpm::moveRobotForwardTime(420);
+    Cpm::moveRobotForward(420);
     vex::task::sleep(200);
 
     // Lift bottom of the pusher high enough to clear the ledge
@@ -102,7 +102,7 @@ namespace AutonAlliUnpro04 {
     vex::task::sleep(200);
 
     // Straighten out the stack
-    Cpm::moveRobotForwardTime(420);
+    Cpm::moveRobotForward(420);
     vex::task::sleep(200);
 
     // Lift bottom of the pusher high enough to clear the ledge

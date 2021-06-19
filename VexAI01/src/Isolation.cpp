@@ -31,7 +31,7 @@ namespace IsolationMode {
     if (sHasTarget == false) {
       sLeftMotorSpeed = 0;
       sRightMotorSpeed = 0;
-      sIntakeMotorSpeed = 0;
+      //sIntakeMotorSpeed = 0;
       leftRight = 0;    // no valid target
       //Implement Search for Target
     }
@@ -39,28 +39,28 @@ namespace IsolationMode {
     else if (sCurX <= (centerX - 100 * 2)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
-      sIntakeMotorSpeed = 0;
+      //sIntakeMotorSpeed = 0;
       leftRight = 1;    // Left
     }
     //else if (sCurX >= 190) {
     else if (sCurX >= (centerX + 100 * 2)) {
       sLeftMotorSpeed = MaxSpeed;
       sRightMotorSpeed = MaxSpeed * -1;
-      sIntakeMotorSpeed = 0;
+      //sIntakeMotorSpeed = 0;
       leftRight = 2;    // Right
     }
     //else if (sCurX <= 155) {
     else if (sCurX <= (centerX - 60 * 2)) {
       sLeftMotorSpeed = HalfSpeed *  -1;
       sLeftMotorSpeed = HalfSpeed;
-      sIntakeMotorSpeed = 0;
+      //sIntakeMotorSpeed = 0;
       leftRight = 1;    // Left
     }
     //else if (sCurX >= 165) {
     else if (sCurX >= (centerX + 60 * 2)) {
       sLeftMotorSpeed = HalfSpeed;
       sRightMotorSpeed = HalfSpeed * -1;
-      sIntakeMotorSpeed = 0;
+      //sIntakeMotorSpeed = 0;
       leftRight = 2;    // Right
     }
     else {  // We are pretty much pointing at the target
@@ -77,16 +77,19 @@ namespace IsolationMode {
       else {
         sLeftMotorSpeed = 15;
         sRightMotorSpeed = 15;
-        sIntakeMotorSpeed = 150;
-      }
+        Cpm::startBottomIntakes();
+        Cpm::startMiddleIntake();
+        LimitSwitchD.pressed(Cpm::stopBottomIntakes);
+        LimitSwitchD.pressed(Cpm::stopMiddleIntake);
+        }
+     }
 
       //else {
         //sLeftMotorSpeed = 0;
         //sRightMotorSpeed = 0;
         //sIntakeMotorSpeed = 0;
       //}
-    }
-    setJetsonDisplay(leftRight);
+    //setJetsonDisplay(leftRight);
   }
 
   //-----------------------
@@ -96,25 +99,28 @@ namespace IsolationMode {
     
     Cpm::stopAllMotors();
     
-    Cpm::moveRobotForwardTime(500);
-    Cpm::moveRobotBackwardTime(500);
-    Cpm::turnRobotLeft(2000);
-    Cpm::turnRobotRight(2000);
-    Cpm::startAllIntakes();
-    vex::task::sleep(500);
-    Cpm::stopAllIntakes();
-    vex::task::sleep(1000);
-    Cpm::startBottomIntakes();
-    vex::task::sleep(500);
-    Cpm::stopBottomIntakes();
-    vex::task::sleep(1000);
-    Cpm::startMiddleIntake();
-    vex::task::sleep(500);
-    Cpm::stopMiddleIntake();
-    vex::task::sleep(1000);
-    Cpm::startTopIntakes();
-    vex::task::sleep(500);
-    Cpm::stopTopIntakes();
+    Cpm::moveRobotForward(24);
+    vex::task::sleep(200);
+    Cpm::turnRobotLeft(135);
+    //Cpm::moveRobotForward(500);
+    //Cpm::moveRobotBackward(500);
+    //Cpm::turnRobotLeft(2000);
+    //Cpm::turnRobotRight(2000);
+    //Cpm::startAllIntakes();
+    //vex::task::sleep(500);
+    //Cpm::stopAllIntakes();
+    //vex::task::sleep(1000);
+    //Cpm::startBottomIntakes();
+    //vex::task::sleep(500);
+    //Cpm::stopBottomIntakes();
+    //vex::task::sleep(1000);
+    //Cpm::startMiddleIntake();
+    //vex::task::sleep(500);
+    //Cpm::stopMiddleIntake();
+    //vex::task::sleep(1000);
+    //Cpm::startTopIntakes();
+    //vex::task::sleep(500);
+    //Cpm::stopTopIntakes();
 
     // Enter the main control loop
     while (true) {
@@ -128,10 +134,10 @@ namespace IsolationMode {
       hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
       hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
       hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-      hwMotorIntakeLeft.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      hwMotorIntakeRight.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      hwMotorIntakeLifter.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      hwMotorPusher.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeLeft.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeRight.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeLifter.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorPusher.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
 
       // Short delay just in case we want to display something on the controller
       //vex::task::sleep(1);

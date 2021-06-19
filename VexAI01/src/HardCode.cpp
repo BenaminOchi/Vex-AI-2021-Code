@@ -19,7 +19,7 @@
     Cpm::setWheelAndIntakeSpeeds(50,0);
     //Cpm::setPusherSpeed(100);
 
-    Cpm::moveRobotForwardTime(500);
+    Cpm::moveRobotForward(500);
     vex::task::sleep(200);
 
    }

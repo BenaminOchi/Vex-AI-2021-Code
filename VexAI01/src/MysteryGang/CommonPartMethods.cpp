@@ -155,13 +155,14 @@ namespace Cpm {
     hwMotorWheelBackRight.stop();
   }
 
-  void moveRobotForwardTime(unsigned int numMillisecs) {
+  void moveRobotForward(unsigned int numInches) {
     // Move forward
+    int numMillisecs = numInches *  50;
     int leftMotorSpeed;
     int rightMotorSpeed;
 
-    leftMotorSpeed = 70;
-    rightMotorSpeed = 70;
+    leftMotorSpeed = 40;
+    rightMotorSpeed = 40;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
     hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
@@ -171,13 +172,14 @@ namespace Cpm {
     stopWheels();
   }
 
-  void moveRobotBackwardTime(unsigned int numMillisecs) {
+  void moveRobotBackward(unsigned int numInches) {
     // Move forward
+    int numMillisecs = numInches *  50;
     int leftMotorSpeed;
     int rightMotorSpeed;
 
-    leftMotorSpeed = 70;
-    rightMotorSpeed = 70;
+    leftMotorSpeed = 40;
+    rightMotorSpeed = 40;
     hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
     hwMotorWheelBackLeft.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelFrontRight.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct);
@@ -187,11 +189,12 @@ namespace Cpm {
     stopWheels();
   }
 
-  void turnRobotLeft(unsigned int numMillisecs) {
+  void turnRobotLeft(unsigned int numDegrees) {
     // Turn left
     //hwMotorWheelFrontLeft.resetPosition();
     //hwMotorWheelBackLeft.resetPosition();
 
+    double numMillisecs = numDegrees * 30;
     int leftMotorSpeed = 10;
     int rightMotorSpeed = 10;
     hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
@@ -205,8 +208,9 @@ namespace Cpm {
     stopWheels();
   }
 
-  void turnRobotRight(unsigned int numMillisecs) {
+  void turnRobotRight(unsigned int numDegrees) {
     // Turn right
+    double numMillisecs = numDegrees * 30;
     int leftMotorSpeed = 10;
     int rightMotorSpeed = 10;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 

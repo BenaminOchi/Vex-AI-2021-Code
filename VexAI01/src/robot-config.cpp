@@ -9,6 +9,7 @@ brain  Brain;
 
 // VEXcode device constructors
 bumper BumperC = bumper(Brain.ThreeWirePort.C);
+limit LimitSwitchD = limit(Brain.ThreeWirePort.D);
 
 // VEXcode generated functions
 

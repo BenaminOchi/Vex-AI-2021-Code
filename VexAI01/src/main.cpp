@@ -4,6 +4,7 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // BumperC              bumper        C               
+// LimitSwitchD         limit         D               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "MysteryGang/AutonMode.h"
 #include "MysteryGang/CommonPartMethods.h"
