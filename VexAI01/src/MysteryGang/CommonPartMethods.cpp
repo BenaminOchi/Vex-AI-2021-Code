@@ -134,9 +134,11 @@ namespace Cpm {
   }
 
   void stopAllMotors() {
-    stopCubeTreads();
-    stopPusher();
-    stopWheels();
+    hwMotorWheelBackLeft.stop();
+    hwMotorWheelBackRight.stop();
+    hwMotorWheelFrontLeft.stop();
+    hwMotorWheelFrontRight.stop();
+    stopAllIntakes();
   }
   
   void stopCubeTreads() {

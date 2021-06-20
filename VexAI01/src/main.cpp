@@ -6,7 +6,6 @@
 // BumperC              bumper        C               
 // LimitSwitchD         limit         D               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-#include "MysteryGang/AutonMode.h"
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/CurConfig.h"
 #include "MysteryGang/InteractiveMode.h"
@@ -110,7 +109,7 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void enterAutonomous(void) { 
-  AutonMode::enterAutonomousControl();
+  //AutonMode::enterAutonomousControl();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -135,7 +134,6 @@ int main() {
 
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
-  CurConfig::displayConfigController();
 
   int32_t loop_time = 66;     // Run at about 15Hz
 
