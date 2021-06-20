@@ -1,7 +1,7 @@
 #include "IsolationMode.h"
 
 
-class IsolationMode {
+namespace IsolationMode {
 
   void enterMain() {
 	// TBD - Finish
@@ -22,4 +22,4 @@ class IsolationMode {
 	return "TbdVersion";
   }
 
-};
+}

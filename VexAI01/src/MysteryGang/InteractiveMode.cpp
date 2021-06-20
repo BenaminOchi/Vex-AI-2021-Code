@@ -1,7 +1,7 @@
 #include "InteractiveMode.h"
 
 
-class InteractiveMode {
+namespace InteractiveMode {
 
   void enterMain() {
 	// TBD - Finish
@@ -22,4 +22,4 @@ class InteractiveMode {
 	return "TbdVersion";
   }
 
-};
+}

@@ -1,12 +1,15 @@
 #ifndef _IsolationMode_H
 #define _IsolationMode_H
 
-#include "MysteryGang/Mode.h"
 
+namespace IsolationMode {
+  void enterMain();
+  const char* getBuildDate();
+  const char* getBuildTime();
+  const char* getVersion();
 
-class IsolationMode : Mode {
   //int controlTask();
   //void setWheelSpeeds();
-};
+}
 
 #endif
