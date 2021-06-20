@@ -101,7 +101,7 @@ namespace IsolationMode {
         LimitSwitchD.pressed(Cpm::stopMiddleIntake);
       }
     }
-    //setJetsonDisplay(leftRight);
+    setJetsonDisplay(leftRight);
   }
 
   //-----------------------

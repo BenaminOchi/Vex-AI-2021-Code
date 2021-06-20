@@ -25,25 +25,25 @@ static uint32_t sPayloadCrc32 = 0;  //<cdo>
 static bool     sIgnoreCrc32  = true;  //<cdo>
 
 /*---------------------------------------------------------------------------*/
-/** @brief  Constructor                                                      */
+/*  Constructor                                                      */
 /*---------------------------------------------------------------------------*/
 // Create high priority task to handle incomming data
 //
 jetson::jetson() {
-    state = jetson_state::kStateSyncWait1;
+  state = jetson_state::kStateSyncWait1;
 
-    thread t1 = thread( receive_task, static_cast<void *>(this) );
-    t1.setPriority(thread::threadPriorityHigh);
+  thread t1 = thread( receive_task, static_cast<void *>(this) );
+  t1.setPriority(thread::threadPriorityHigh);
 }
 
 jetson::~jetson() {
 }
 
 /*---------------------------------------------------------------------------*/
-/** @brief  Get the total number of good received packets                    */
+/*  Get the total number of good received packets                    */
 /*---------------------------------------------------------------------------*/
 int32_t jetson::get_packets() {
-    return packets;
+  return packets;
 }
 
 uint32_t jetson::getCalcCrc32() {  //<cdo>
@@ -54,42 +54,41 @@ uint32_t jetson::getPayloadCrc32() {  //<cdo>
 }
 
 /*---------------------------------------------------------------------------*/
-/** @brief  Get the total number of bad received packets                     */
+/*  Get the total number of bad received packets                     */
 /*---------------------------------------------------------------------------*/
 int32_t jetson::get_errors() {
-    return errors;
+  return errors;
 }
 /*---------------------------------------------------------------------------*/
-/** @brief  Get the number of timeouts that have been triggered              */
+/*  Get the number of timeouts that have been triggered              */
 /*---------------------------------------------------------------------------*/
 int32_t jetson::get_timeouts() {
-    return timeouts;
+  return timeouts;
 }
 /*---------------------------------------------------------------------------*/
-/** @brief  Get the total number of bytes received                           */
+/*  Get the total number of bytes received                           */
 /*---------------------------------------------------------------------------*/
 int32_t jetson::get_total() {
-    return total_data_received;
+  return total_data_received;
 }
 
 /*---------------------------------------------------------------------------*/
-/** @brief  Get the last received map record                                 */
+/* Get the last received map record                                 */
 /*---------------------------------------------------------------------------*/
 //
 // The map record is copied to user supplied buffer
 // length of the valid data is returned
 // 
-int32_t jetson::get_data( MAP_RECORD *map ) {
-    int32_t length = 0;
+int32_t jetson::get_data(MAP_RECORD* map) {
+  int32_t length = 0;
 
-    if( map != NULL ) {
-        maplock.lock();
-        memcpy( map, &last_map, sizeof(MAP_RECORD));
-        length = last_payload_length;
-        maplock.unlock();
-    }
-
-    return length;
+  if (map != NULL) {
+    maplock.lock();
+    memcpy(map, &last_map, sizeof(MAP_RECORD));
+    length = last_payload_length;
+    maplock.unlock();
+  }
+  return length;
 }
 
 /*----------------------------------------------------------------------------*/

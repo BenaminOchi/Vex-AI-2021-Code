@@ -1,51 +1,13 @@
 #include "vex.h"
 #include "MysteryGang/RobotConfig.h"
 
-//#define ENABLE_COMM_DBG
-
-static vex::mutex sBoxLock;
-static int   sCurClassId = 0;
-static int   sCurX       = 0;
-static int   sCurY       = 0;
-static float sCurWidthI  = 0.0;
-static float sCurHeightI = 0.0;
-static float sCurDepthI  = 0.0;
-static bool  sHasTargets = false;
+#define ENABLE_COMM_DBG
 
 static int sLeftRight = 0;      //lr: 0=notDetected | 1=left | 2=right | 3=onTarget
 
 
 void setJetsonDisplay(int lr) {
   sLeftRight = lr;
-}
-
-void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, float* heightI, float* depthI) {
-  sBoxLock.lock();
-  *classId    = sCurClassId;
-  *x          = sCurX;
-  *y          = sCurY;
-  *widthI     = sCurWidthI;
-  *heightI    = sCurHeightI;
-  *depthI     = sCurDepthI;
-  *hasTarget  = sHasTargets;
-  sBoxLock.unlock();
-}
-
-static void setBoxData(int classId, int x, int y, float widthI, float heightI, float depthI) {
-  sBoxLock.lock();
-  sCurClassId = classId;
-  sCurX       = x;
-  sCurY       = y;
-  sCurWidthI  = widthI;
-  sCurHeightI = heightI;
-  sCurDepthI  = depthI;
-  if (widthI == 0.0) {
-    sHasTargets = false;
-  }
-  else {
-    sHasTargets = true;
-  }
-  sBoxLock.unlock();
 }
 
 //
@@ -74,7 +36,7 @@ static void dashboardJetson() {
   hwBrain.Screen.newLine();
 }
 
-static void dashboardJetson( int ox, int oy, int width, int height ) {
+static void dashboardJetson(int ox, int oy, int width, int height) {
   static int32_t     last_data = 0;
   static int32_t     last_packets = 0;
   static int32_t     total_data = 0;
@@ -83,7 +45,7 @@ static void dashboardJetson( int ox, int oy, int width, int height ) {
   static MAP_RECORD  local_map;
   color grey = vex::color(0x404040);
 
-#ifdef ENABLE_COMM_DBG
+  #ifdef ENABLE_COMM_DBG
   Brain.Screen.setClipRegion( ox, oy, width, height);
   Brain.Screen.setFont( mono15 );
   // border and titlebar
@@ -94,18 +56,18 @@ static void dashboardJetson( int ox, int oy, int width, int height ) {
   Brain.Screen.setPenColor( yellow );
   Brain.Screen.setFillColor( grey );
   Brain.Screen.printAt(ox + 10, oy + 15, "Jetson" );
-#endif
+  #endif
   oy += 20;
   
-#ifdef ENABLE_COMM_DBG
+  #ifdef ENABLE_COMM_DBG
   Brain.Screen.setPenColor( white );
   Brain.Screen.setFillColor( black );
-#endif
+  #endif
 
   // get last map data
   jetson_comms.get_data( &local_map );
 
-#ifdef ENABLE_COMM_DBG
+  #ifdef ENABLE_COMM_DBG
   Brain.Screen.printAt( ox + 10, oy += 15, "Packets   %d", jetson_comms.get_packets() );
   Brain.Screen.printAt( ox + 10, oy += 15, "Errors    %d", jetson_comms.get_errors() );
   Brain.Screen.printAt( ox + 10, oy += 15, "Timeouts  %d", jetson_comms.get_timeouts() );
@@ -115,10 +77,10 @@ static void dashboardJetson( int ox, int oy, int width, int height ) {
   Brain.Screen.printAt( ox + 10, oy += 15, "mapnum    %d", local_map.mapnum );
   Brain.Screen.printAt( ox + 10, oy += 15, "RxCRC     %x", jetson_comms.getPayloadCrc32()); //<cdo>
   Brain.Screen.printAt( ox + 10, oy += 15, "CalcCRC   %x", jetson_comms.getCalcCrc32()); //<cdo>
-#endif
+  #endif
 
   // once per second, update data rate stats
-  if( Brain.Timer.system() > update_time ) {
+  if (Brain.Timer.system() > update_time) {
     update_time = Brain.Timer.system() + 1000;
     total_data = jetson_comms.get_total() - last_data;
     total_packets = jetson_comms.get_packets() - last_packets;
@@ -126,58 +88,45 @@ static void dashboardJetson( int ox, int oy, int width, int height ) {
     last_packets = jetson_comms.get_packets();
   }
   
-  Brain.Screen.setFont( mono12 );
+  Brain.Screen.setFont(mono12);
   float widthI = 0.0;
   float heightI = 0.0;
   float depthI = 0.0;
   bool hasValidTarget = false;
-  for(int i=0;i<4;i++ ) {
-    if( i < local_map.boxnum ) {
+  for (int i=0;i<4;i++) {
+    if (i < local_map.boxnum) {
       widthI = local_map.boxobj[i].width / 25.4;
       heightI = local_map.boxobj[i].height / 25.4;
       depthI = local_map.boxobj[i].depth / 25.4;
-#ifdef ENABLE_COMM_DBG
-      Brain.Screen.printAt( ox + 10, oy += 12, "box %d: c:%d x:%d y:%d w:%.1f h:%.1f d:%.1f",i,
+      #ifdef ENABLE_COMM_DBG
+      Brain.Screen.printAt(ox + 10, oy += 12, "box %d: c:%d x:%d y:%d w:%.1f h:%.1f d:%.1f",i,
                            local_map.boxobj[i].classID, //Class ID (0 = Red 1 = Blue 2 = Goal)
                            local_map.boxobj[i].x, //in pixels
                            local_map.boxobj[i].y, //in pixels
-                           widthI,
-                           heightI,
-                           depthI);
-#endif
-      const unsigned int RED_BALL = 0;
-      const unsigned int BLUE_BALL = 1;
-      if (local_map.boxobj[i].classID == RED_BALL) {
-        hasValidTarget = true;
-        setBoxData(local_map.boxobj[i].classID,
-                    local_map.boxobj[i].x, local_map.boxobj[i].y,
-                    widthI, heightI, depthI);        
-      }
+                           widthI, heightI, depthI);
+      #endif
     }
     else {
-#ifdef ENABLE_COMM_DBG
-      Brain.Screen.printAt( ox + 10, oy += 12, "---");
-#endif
+      #ifdef ENABLE_COMM_DBG
+      Brain.Screen.printAt(ox + 10, oy += 12, "---");
+      #endif
     }
   }
-  if (hasValidTarget == false) {
-    setBoxData(1, 0, 0, 0.0, 0.0, 0.0);
-  }
-  for (int i=0;i<4;i++ ) {
-    if( i < local_map.mapnum ) {
-#ifdef ENABLE_COMM_DBG
-      Brain.Screen.printAt( ox + 10, oy += 12, "map %d: a:%4d c:%4d X:%.2f Y:%.2f Z:%.1f",i,
+  for (int i=0;i<4;i++) {
+    if (i < local_map.mapnum) {
+      #ifdef ENABLE_COMM_DBG
+      Brain.Screen.printAt(ox + 10, oy += 12, "map %d: a:%4d c:%4d X:%.2f Y:%.2f Z:%.1f",i,
                            local_map.mapobj[i].age,
                            local_map.mapobj[i].classID,
                            (local_map.mapobj[i].positionX / -25.4),  // mm -> inches
                            (local_map.mapobj[i].positionY / -25.4),  // mm -> inches
                            (local_map.mapobj[i].positionZ / 25.4)); // mm -> inches
-#endif
+      #endif
     }
     else {
-#ifdef ENABLE_COMM_DBG
+      #ifdef ENABLE_COMM_DBG
       Brain.Screen.printAt( ox + 10, oy += 12, "---");
-#endif
+      #endif
     }
   }
 
@@ -196,7 +145,7 @@ static void dashboardVexlink( int ox, int oy, int width, int height ) {
   color darkred = vex::color(0x800000);
   color darkgrn = vex::color(0x008000);
 
-#ifdef ENABLE_COMM_DBG
+  #ifdef ENABLE_COMM_DBG
   Brain.Screen.setClipRegion( ox, oy, width, height);
   Brain.Screen.setFont( mono15 );
 
@@ -211,25 +160,12 @@ static void dashboardVexlink( int ox, int oy, int width, int height ) {
   Brain.Screen.drawRectangle( ox+1, oy+1, width-2, 18 );
   Brain.Screen.setPenColor(yellow);
   Brain.Screen.printAt(ox + 10, oy + 15, "VEXlink: Disconnected" );
-#endif
+  #endif
   oy += 20;
 
   // get last map data
   static MAP_RECORD  local_map;
   jetson_comms.get_data( &local_map );
-#if 0
-typedef struct {
-	int32_t		framecnt;       // This counter increments each frame
-	int32_t		status;         // 0 = All Good, != 0 = Not All Good
-	float	    x, y, z;        // X,Y,Z field coordinates in millimeters. Position 0,0 is in the middle of the field.
-                            // Z is mm from the field tiles.
-                            // NOTE: These coordinates are for the GPS sensor (FLIR Camera) If you want to know the location of the 
-                            // center of your robot you will have add an offset. 
-	float	    az;             // Rotation of the robot in radians (Heading)
-  float     el;             // Elevation of the robot in radians (Pitch)
-  float     rot;            // Rotation/Tilt of the robot in radians (Roll)
-} POS_RECORD;
-#endif
 
   char lr = '-';
   if (sLeftRight == 3) {
@@ -243,7 +179,7 @@ typedef struct {
   }
   Brain.Screen.setFillColor(black);
   Brain.Screen.setPenColor(white);
-#ifdef ENABLE_COMM_DBG
+  #ifdef ENABLE_COMM_DBG
   Brain.Screen.printAt( ox + 10, oy += 15, "FrameCnt  %d", local_map.pos.framecnt );
   Brain.Screen.printAt( ox + 10, oy += 15, "Status    %d", local_map.pos.status );
   Brain.Screen.printAt( ox + 10, oy += 15, "x         %d", int(local_map.pos.x) );
@@ -253,22 +189,22 @@ typedef struct {
   Brain.Screen.printAt( ox + 10, oy += 15, "el        %d", int(local_map.pos.el));
   Brain.Screen.printAt( ox + 10, oy += 15, "rot       %d", int(local_map.pos.rot));
   Brain.Screen.printAt( ox + 10, oy += 15, "L/R       %c", lr);
-#endif
+  #endif
 }
 
 //
 // Task to update screen with status
 //
 int dashboardTask() {
-  while(true) {
+  while (true) {
     // status
     //dashboardJetson();
     dashboardJetson(    0, 0, 280, 240 );
     dashboardVexlink( 279, 0, 201, 240 );
     // draw, at 30Hz
-#ifdef ENABLE_COMM_DBG
+    #ifdef ENABLE_COMM_DBG
     Brain.Screen.render();
-#endif
+    #endif
     //this_thread::sleep_for(16*100);
     this_thread::sleep_for(16);
   }

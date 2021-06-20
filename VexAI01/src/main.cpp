@@ -73,7 +73,7 @@ void autonomousMain(void) {
   // and we will enter the interaction period. 
   // ..........................................................................
 
-  if(firstAutoFlag)
+  if (firstAutoFlag)
     auto_Isolation();
   else 
     auto_Interaction();
@@ -129,17 +129,19 @@ void enterUserControl(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  int32_t loop_time = 66;     // Run at about 15Hz
+
   // Run the pre-autonomous function.
   pre_auton();
 
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-  int32_t loop_time = 66;     // Run at about 15Hz
 
-  thread t1(dashboardTask);   // Start the status update display
-  thread t2(IsolationMode::controlTask);
-  //thread t3(InteractiveMode::controlTask);
+  thread tDash(dashboardTask);   // Start the status update display
+  tDash.setPriority(thread::threadPriorityLow);
+  thread tIsol(IsolationMode::controlTask);
+  //thread tInter(InteractiveMode::controlTask);
 
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);

@@ -102,7 +102,7 @@ namespace InteractiveMode {
         LimitSwitchD.pressed(Cpm::stopMiddleIntake);
         }
      }
-    //setJetsonDisplay(leftRight);
+    setJetsonDisplay(leftRight);
   }
 
   //-----------------------
