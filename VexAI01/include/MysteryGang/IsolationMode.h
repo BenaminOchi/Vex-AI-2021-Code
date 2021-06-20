@@ -8,8 +8,8 @@ namespace IsolationMode {
   const char* getBuildTime();
   const char* getVersion();
 
-  //int controlTask();
-  //void setWheelSpeeds();
+  int controlTask();
+  void setWheelSpeeds();
 }
 
 #endif

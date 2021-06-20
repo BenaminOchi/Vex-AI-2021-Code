@@ -8,7 +8,8 @@ namespace InteractiveMode {
   const char* getBuildTime();
   const char* getVersion();
 
-  //int controlTask();
+  int controlTask();
+  void setWheelSpeeds();
 }
 
 #endif

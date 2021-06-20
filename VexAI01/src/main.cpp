@@ -9,9 +9,10 @@
 #include "MysteryGang/AutonMode.h"
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/CurConfig.h"
+#include "MysteryGang/InteractiveMode.h"
+#include "MysteryGang/IsolationMode.h"
 #include "MysteryGang/ManualMode.h" 
 #include "MysteryGang/RobotConfig.h"
-#include "Isolation.h"
 
 extern void driveForward();
 
@@ -145,7 +146,8 @@ int main() {
   // start the status update display
   thread t1(dashboardTask);
 
-  thread t2(IsolationMode::isolationModeTask);
+  thread t2(IsolationMode::controlTask);
+  thread t3(InteractiveMode::controlTask);
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);
   //enterUserControl();
