@@ -81,5 +81,18 @@ namespace Cpm {
 
   void stopTopIntakes();
 
+  bool wasLimitSwitchPressed();
+
+  void setLimitSwitchPressed();
+
+  void clearLimitSwitchPressed();
+
+  bool wasBumperSwitchPressed();
+
+  void setBumperSwitchPressed();
+
+  void clearBumperSwitchPressed();
+
+  void coastWheels();
 }
 #endif

@@ -1,11 +1,4 @@
 #include "vex.h"
-
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// BumperC              bumper        C               
-// LimitSwitchD         limit         D               
-// ---- END VEXCODE CONFIGURED DEVICES ----
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/CurConfig.h"
 #include "MysteryGang/InteractiveMode.h"
@@ -13,7 +6,10 @@
 #include "MysteryGang/ManualMode.h" 
 #include "MysteryGang/RobotConfig.h"
 
-extern void driveForward();
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// ---- END VEXCODE CONFIGURED DEVICES ----
+
+
 
 // create instance of jetson class to receive location and other
 // data from the Jetson nano
@@ -34,6 +30,7 @@ void auto_Isolation(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  IsolationMode::enterMain();
 }
 
 
@@ -52,6 +49,7 @@ void auto_Interaction(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  InteractiveMode::enterMain();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -101,19 +99,6 @@ void pre_auton(void) {
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-void enterAutonomous(void) { 
-  //AutonMode::enterAutonomousControl();
-}
-
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
 /*                              User Control Task                            */
 /*                                                                           */
 /*  This task is used to control your robot during the user control phase of */
@@ -137,16 +122,12 @@ int main() {
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-
-  thread tDash(dashboardTask);   // Start the status update display
-  tDash.setPriority(thread::threadPriorityLow);
-  thread tIsol(IsolationMode::controlTask);
-  //thread tInter(InteractiveMode::controlTask);
+  //thread tDash(dashboardTask);   // Start the status update display
+  //tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
-  //hwCompetition.autonomous(autonomousMain);
+  hwCompetition.autonomous(autonomousMain);
   //enterUserControl();
-  //driveForward();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

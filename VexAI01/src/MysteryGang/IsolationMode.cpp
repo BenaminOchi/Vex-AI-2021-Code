@@ -5,6 +5,10 @@
 extern void setJetsonDisplay(int lr);
 extern void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, float* heightI, float* depthI);
 
+static const char* sBuildDate = __DATE__;
+static const char* sBuildTime = __TIME__;
+static const char* sVersion = "0001";
+
 static bool sHasTarget       = false;
 static int   sCurClassId     = 0;
 static int   sCurX           = 0;
@@ -15,28 +19,26 @@ static float sCurDepthI      = 0.0;
 
 static int sLeftMotorSpeed   = 0;
 static int sRightMotorSpeed  = 0;
-static int sIntakeMotorSpeed = 0;
 
+static bool sIsTaskSuspended = false;
+static bool sIsTracking = true;
 
 namespace IsolationMode {
 
   void enterMain() {
-	// TBD - Finish
+    thread tIsol(IsolationMode::controlTask);
   }
 
   const char* getBuildDate() {
-    // TBD - Finish
-    return "TbdBuildDate";
+    return sBuildDate;
   }
 
   const char* getBuildTime() {
-    // TBD - Finish
-	return "TbdBuildTime";
+	return sBuildTime;
   }
 
   const char* getVersion() {
-    // TBD - Finish
-	return "TbdVersion";
+	return sVersion;
   }
 
   void setWheelSpeeds() {
@@ -45,40 +47,48 @@ namespace IsolationMode {
     const int HalfSpeed = 4;  //TBD: 75;
     int targetDistance = sCurDepthI;
     int leftRight = 3;  // Default to: pointing at target
+    static bool sIsTargetInRange = false;
 
     if (sHasTarget == false) {
-      sLeftMotorSpeed = 0;
-      sRightMotorSpeed = 0;
-      //sIntakeMotorSpeed = 0;
       leftRight = 0;    // no valid target
-      //Implement Search for Target
+      if (sIsTargetInRange == false) {
+        Cpm::coastWheels();
+      }
+      else {
+        LimitSwitchD.pressed(Cpm::setLimitSwitchPressed);
+        BumperC.pressed(Cpm::setBumperSwitchPressed);
+        if (Cpm::wasLimitSwitchPressed() == true) {
+          Cpm::stopAllMotors();
+          sIsTracking = false;
+        }
+        if (Cpm::wasBumperSwitchPressed() == true) {
+          Cpm::stopAllMotors();
+          sIsTracking = false;
+        }
+      }
     }
     //else if (sCurX <= 130) {
     else if (sCurX <= (centerX - 100 * 2)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
-      //sIntakeMotorSpeed = 0;
       leftRight = 1;    // Left
     }
     //else if (sCurX >= 190) {
     else if (sCurX >= (centerX + 100 * 2)) {
       sLeftMotorSpeed = MaxSpeed;
       sRightMotorSpeed = MaxSpeed * -1;
-      //sIntakeMotorSpeed = 0;
       leftRight = 2;    // Right
     }
     //else if (sCurX <= 155) {
     else if (sCurX <= (centerX - 60 * 2)) {
       sLeftMotorSpeed = HalfSpeed *  -1;
       sLeftMotorSpeed = HalfSpeed;
-      //sIntakeMotorSpeed = 0;
       leftRight = 1;    // Left
     }
     //else if (sCurX >= 165) {
     else if (sCurX >= (centerX + 60 * 2)) {
       sLeftMotorSpeed = HalfSpeed;
       sRightMotorSpeed = HalfSpeed * -1;
-      //sIntakeMotorSpeed = 0;
       leftRight = 2;    // Right
     }
     else {  // We are pretty much pointing at the target
@@ -97,8 +107,7 @@ namespace IsolationMode {
         sRightMotorSpeed = 15;
         Cpm::startBottomIntakes();
         Cpm::startMiddleIntake();
-        LimitSwitchD.pressed(Cpm::stopBottomIntakes);
-        LimitSwitchD.pressed(Cpm::stopMiddleIntake);
+        sIsTargetInRange = true;
       }
     }
     setJetsonDisplay(leftRight);
@@ -114,46 +123,64 @@ namespace IsolationMode {
     Cpm::moveRobotForward(24);
     vex::task::sleep(200);
     Cpm::turnRobotLeft(135);
-    //Cpm::moveRobotForward(500);
-    //Cpm::moveRobotBackward(500);
-    //Cpm::turnRobotLeft(2000);
-    //Cpm::turnRobotRight(2000);
-    //Cpm::startAllIntakes();
-    //vex::task::sleep(500);
-    //Cpm::stopAllIntakes();
-    //vex::task::sleep(1000);
-    //Cpm::startBottomIntakes();
-    //vex::task::sleep(500);
-    //Cpm::stopBottomIntakes();
-    //vex::task::sleep(1000);
-    //Cpm::startMiddleIntake();
-    //vex::task::sleep(500);
-    //Cpm::stopMiddleIntake();
-    //vex::task::sleep(1000);
-    //Cpm::startTopIntakes();
-    //vex::task::sleep(500);
-    //Cpm::stopTopIntakes();
 
     // Enter the main control loop
     while (true) {
-      // Get latest info on the target
-      getBoxData(&sHasTarget, &sCurClassId, &sCurX, &sCurY, &sCurWidthI, &sCurHeightI, &sCurDepthI);
+      if (sIsTracking == true) {
+        // Get latest info on the target
+        getBoxData(&sHasTarget, &sCurClassId, &sCurX, &sCurY, &sCurWidthI, &sCurHeightI, &sCurDepthI);
 
-      setWheelSpeeds();
+        setWheelSpeeds();
 
-      // Move wheels based on trackloop positions
-      hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-      hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-      hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-      hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-      //hwMotorIntakeLeft.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      //hwMotorIntakeRight.spin(vex::directionType::fwd, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      //hwMotorIntakeLifter.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
-      //hwMotorPusher.spin(vex::directionType::rev, sIntakeMotorSpeed, vex::velocityUnits::pct);
+        if (sIsTracking == true) {
+          // Move wheels based on trackloop positions
+          hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+          hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+          hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+          hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+        }
+      }
 
-      // Short delay just in case we want to display something on the controller
-      //vex::task::sleep(1);
+      if (sIsTaskSuspended == true) {
+        break;
+      }
     }
+    return 0;
   }
 
+  void suspendTask() {
+    sIsTaskSuspended = true;
+  }
+
+  void testCpm() {
+    Cpm::stopAllMotors();
+
+    Cpm::moveRobotForward(24);
+    vex::task::sleep(200);
+    Cpm::turnRobotLeft(135);
+    vex::task::sleep(200);
+    Cpm::moveRobotForward(500);
+    vex::task::sleep(200);
+    Cpm::moveRobotBackward(500);
+    vex::task::sleep(200);
+    Cpm::turnRobotLeft(2000);
+    vex::task::sleep(200);
+    Cpm::turnRobotRight(2000);
+    vex::task::sleep(200);
+    Cpm::startAllIntakes();
+    vex::task::sleep(500);
+    Cpm::stopAllIntakes();
+    vex::task::sleep(1000);
+    Cpm::startBottomIntakes();
+    vex::task::sleep(500);
+    Cpm::stopBottomIntakes();
+    vex::task::sleep(1000);
+    Cpm::startMiddleIntake();
+    vex::task::sleep(500);
+    Cpm::stopMiddleIntake();
+    vex::task::sleep(1000);
+    Cpm::startTopIntakes();
+    vex::task::sleep(500);
+    Cpm::stopTopIntakes();
+  }
 }

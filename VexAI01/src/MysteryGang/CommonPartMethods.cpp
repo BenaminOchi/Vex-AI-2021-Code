@@ -134,10 +134,7 @@ namespace Cpm {
   }
 
   void stopAllMotors() {
-    hwMotorWheelBackLeft.stop();
-    hwMotorWheelBackRight.stop();
-    hwMotorWheelFrontLeft.stop();
-    hwMotorWheelFrontRight.stop();
+    stopWheels();
     stopAllIntakes();
   }
   
@@ -268,5 +265,38 @@ namespace Cpm {
   void stopTopIntakes() {
     hwMotorIntakeLifter.stop();
     hwMotorPusher.stop();
+  }
+
+  static bool sLimitSwitchPressed = false;
+  bool wasLimitSwitchPressed() {
+    return sLimitSwitchPressed;
+  }
+
+  void setLimitSwitchPressed() {
+    sLimitSwitchPressed = true;
+  }
+
+  void clearLimitSwitchPressed() {
+    sLimitSwitchPressed = false;
+  }
+
+  static bool sBumperSwitchPressed = false;
+  bool wasBumperSwitchPressed() {
+    return sBumperSwitchPressed;
+  }
+
+  void setBumperSwitchPressed() {
+    sBumperSwitchPressed = true;
+  }
+
+  void clearBumperSwitchPressed() {
+    sBumperSwitchPressed = false;
+  }
+
+  void coastWheels() {
+    hwMotorWheelFrontLeft.setStopping(vex::brakeType::coast);
+    hwMotorWheelBackLeft.setStopping(vex::brakeType::coast);
+    hwMotorWheelFrontRight.setStopping(vex::brakeType::coast);
+    hwMotorWheelBackRight.setStopping(vex::brakeType::coast);
   }
 }

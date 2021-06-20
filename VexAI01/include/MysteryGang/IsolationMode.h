@@ -10,6 +10,7 @@ namespace IsolationMode {
 
   int controlTask();
   void setWheelSpeeds();
+  void suspendTask();
 }
 
 #endif
