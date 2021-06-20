@@ -126,8 +126,9 @@ int main() {
   //tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
-  hwCompetition.autonomous(autonomousMain);
-  //enterUserControl();
+  //hwCompetition.autonomous(autonomousMain);
+  IsolationMode::enterMain();  // TEMP for debug
+  //enterUserControl();          // TEMP for debug
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

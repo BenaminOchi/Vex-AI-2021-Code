@@ -29,7 +29,6 @@ namespace CurConfig {
     hwBrain.Screen.print("INTERACTIVE : %s : %s [%s]", InteractiveMode::getVersion(),
       InteractiveMode::getBuildDate(), InteractiveMode::getBuildTime());
     hwBrain.Screen.newLine();
-
   }
 
   void initialize() {
