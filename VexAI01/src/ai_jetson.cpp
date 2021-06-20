@@ -42,8 +42,7 @@ jetson::~jetson() {
 /*---------------------------------------------------------------------------*/
 /** @brief  Get the total number of good received packets                    */
 /*---------------------------------------------------------------------------*/
-int32_t
-jetson::get_packets() {
+int32_t jetson::get_packets() {
     return packets;
 }
 
@@ -57,22 +56,19 @@ uint32_t jetson::getPayloadCrc32() {  //<cdo>
 /*---------------------------------------------------------------------------*/
 /** @brief  Get the total number of bad received packets                     */
 /*---------------------------------------------------------------------------*/
-int32_t
-jetson::get_errors() {
+int32_t jetson::get_errors() {
     return errors;
 }
 /*---------------------------------------------------------------------------*/
 /** @brief  Get the number of timeouts that have been triggered              */
 /*---------------------------------------------------------------------------*/
-int32_t
-jetson::get_timeouts() {
+int32_t jetson::get_timeouts() {
     return timeouts;
 }
 /*---------------------------------------------------------------------------*/
 /** @brief  Get the total number of bytes received                           */
 /*---------------------------------------------------------------------------*/
-int32_t
-jetson::get_total() {
+int32_t jetson::get_total() {
     return total_data_received;
 }
 
@@ -83,8 +79,7 @@ jetson::get_total() {
 // The map record is copied to user supplied buffer
 // length of the valid data is returned
 // 
-int32_t
-jetson::get_data( MAP_RECORD *map ) {
+int32_t jetson::get_data( MAP_RECORD *map ) {
     int32_t length = 0;
 
     if( map != NULL ) {
@@ -110,8 +105,7 @@ jetson::get_data( MAP_RECORD *map ) {
 
 uint32_t jetson::_crc32_table[256];
 
-uint32_t
-jetson::crc32(uint8_t *pData, uint32_t numberOfBytes, uint32_t accumulator) {
+uint32_t jetson::crc32(uint8_t *pData, uint32_t numberOfBytes, uint32_t accumulator) {
   uint32_t i, j;
 
   for(j = 0; j < numberOfBytes; j++) {
@@ -122,16 +116,14 @@ jetson::crc32(uint8_t *pData, uint32_t numberOfBytes, uint32_t accumulator) {
   return accumulator;
 }
 
-//#if 0
 /*---------------------------------------------------------------------------*/
 /** @brief  Parse a single received byte                                     */
 /*---------------------------------------------------------------------------*/
-bool
-jetson::parse( uint8_t data ) {
+bool jetson::parse(uint8_t data) {
     bool  bRecall = false;
 
     // 250mS interbyte timeout
-    if( state != jetson_state::kStateSyncWait1 && timer.time() > 250 ) {
+    if ( state != jetson_state::kStateSyncWait1 && timer.time() > 250 ) {
       timeouts++;
       state = jetson_state::kStateSyncWait1;
     }
@@ -283,205 +275,11 @@ jetson::parse( uint8_t data ) {
 
     return bRecall;
 }
-//#endif
-
-#if 0
-bool jetson::parse( uint8_t data ) {  //<cdo>
-    bool  bRecall = false;
-    static bool sGoodPacketFound = false;
-    static unsigned int sByteCnt = 0;
-
-    if (sGoodPacketFound) {
-      return bRecall;
-    }
-    // 250mS interbyte timeout
-    if( state != jetson_state::kStateSyncWait1 && timer.time() > 250 ) {
-      timeouts++;
-      state = jetson_state::kStateSyncWait1;
-    }
-
-    // reset timeout
-    timer.clear();
-    
-    switch( state ) {
-      /*----------------------------------------------------------------------*/
-      // crude multi byte sync
-      case jetson_state::kStateSyncWait1:
-        if( static_cast<sync_byte>(data) == sync_byte::kSync1 ) {
-          state = jetson_state::kStateSyncWait2;
-        }
-        break;
-
-      case jetson_state::kStateSyncWait2:
-        if( static_cast<sync_byte>(data) == sync_byte::kSync2 ) {
-          state = jetson_state::kStateSyncWait3;
-        }
-        else {
-          state = jetson_state::kStateSyncWait1;
-        }
-        break;
-        
-      case jetson_state::kStateSyncWait3:
-        state = jetson_state::kStateSyncWait1;
-        if( static_cast<sync_byte>(data) == sync_byte::kSync3 ) {
-          state = jetson_state::kStateSyncWait4;
-        }
-        break;
-        
-      case jetson_state::kStateSyncWait4:
-        state = jetson_state::kStateSyncWait1;
-        if( static_cast<sync_byte>(data) == sync_byte::kSync4 ) {
-          state = jetson_state::kStateLength;
-          index = 0;
-          payload_length = 0;
-        }
-        break;
-
-      /*----------------------------------------------------------------------*/
-      // get payload length
-      case jetson_state::kStateLength:
-        //Brain.Screen.print("l%d=%02x ", index, data);
-        // data is 2 byte little endian
-        payload_length = (payload_length >> 8) + ((uint16_t)data << 8);
-
-        if( index++ == 1 ) {
-          Brain.Screen.print("%02X", data);
-          sByteCnt++;
-          //Brain.Screen.newLine();
-          state = jetson_state::kStateSpare;
-          index = 0;
-          payload_type = 0;
-        }
-        else {
-          Brain.Screen.print("AA55CC33%02X", data);
-          sByteCnt = 5;
-        }
-        break;
-
-      /*----------------------------------------------------------------------*/
-      // get packet type
-      case jetson_state::kStateSpare:
-        Brain.Screen.print("%02X", data);
-        sByteCnt++;
-        //Brain.Screen.print("s%d=%02x ", index, data);
-        // data is 2 byte little endian
-        payload_type = (payload_type >> 8) + ((uint16_t)data << 8);
-
-        if( index++ == 1 ) {
-          //Brain.Screen.newLine();
-          state = jetson_state::kStateCrc32;
-          index = 0;
-          payload_crc32 = 0;
-        }
-        break;
-
-      /*----------------------------------------------------------------------*/
-      // get payload crc32
-      case jetson_state::kStateCrc32:
-        Brain.Screen.print("%02X", data);
-        sByteCnt++;
-        //Brain.Screen.print("C%d=%02x ", index, data);
-        // data is 4 byte little endian
-        payload_crc32 = (payload_crc32 >> 8) + ((uint32_t)data << 24);
-        
-        if( index++ == 3 ) {
-          //Brain.Screen.newLine();
-          state = jetson_state::kStatePayload;
-          index = 0;
-          calc_crc32 = 0;
-        }
-        break;
-
-      /*----------------------------------------------------------------------*/
-      // get payload data
-      case jetson_state::kStatePayload:
-        Brain.Screen.print("%02X", data);
-        sByteCnt++;
-        if (sByteCnt > 32) {
-          Brain.Screen.newLine();
-          sByteCnt = 0;
-        }
-
-        //Brain.Screen.print("p=%02x ", data);
-        if( index < sizeof(payload) ) {
-          // add byte to buffer
-          //Brain.Screen.newLine();
-          payload.bytes[index] = data;
-          index++;
-
-          // keep running crc32, save calculating all at once later
-          calc_crc32 = crc32( &data, 1, calc_crc32  );
-          
-          // all data received ?
-          if( index == payload_length ) {
-            sCalcCrc32 = calc_crc32;  //<cdo>
-            sPayloadCrc32 = payload_crc32;  //<cdo>
-            // check crc32
-            if( payload_crc32 == calc_crc32 ) {
-              state = jetson_state::kStateGoodPacket;
-              bRecall = true;
-            }
-            else {
-              state = jetson_state::kStateBadPacket;
-              if (sIgnoreCrc32 == true) {  //<cdo>
-                state = jetson_state::kStateGoodPacket;
-              }
-              bRecall = true;
-            }
-          }
-        }
-        else {
-          // if we end up here then error
-          //
-          state = jetson_state::kStateBadPacket;
-          bRecall = true;
-        }
-        break;
-
-      case jetson_state::kStateGoodPacket:
-        if( payload_type == MAP_PACKET_TYPE ) {
-          MAP_RECORD newMap;
-          // Parse the payload packet into a MAP_RECORD
-          memset(&newMap, 0, sizeof(newMap));
-          memcpy(&newMap, &payload.bytes[0], MAP_POS_SIZE);
-          memcpy(&newMap.boxobj, &payload.bytes[MAP_POS_SIZE], sizeof(fifo_object_box) * newMap.boxnum);
-          memcpy(&newMap.mapobj, &payload.bytes[((sizeof(fifo_object_box) * newMap.boxnum)+MAP_POS_SIZE)], sizeof(MAP_OBJECTS) * newMap.mapnum);
-
-
-          // lock access to last_map and copy data
-          maplock.lock();
-          memcpy( &last_map, &newMap, sizeof(MAP_RECORD));
-          maplock.unlock();
-        }
-
-        // timestamp this packet
-        last_packet_time = timer.system();
-
-        packets++;
-        state = jetson_state::kStateSyncWait1;
-        sGoodPacketFound = true;
-        break;
-
-      case jetson_state::kStateBadPacket:
-        // bad packet
-        errors++;
-        state = jetson_state::kStateSyncWait1;
-        break;
-
-      default:
-        state = jetson_state::kStateSyncWait1;
-        break;
-    }
-
-    return bRecall;
-}
-#endif
 
 /*---------------------------------------------------------------------------*/
 /** @brief  Send request to the Jetson to ask for next packet                */
 /*---------------------------------------------------------------------------*/
-void
-jetson::request_map() {
+void jetson::request_map() {
     // check timeout and clear state machine if necessary
     if( state != jetson_state::kStateSyncWait1 && timer.time() > 250 ) {
       state = jetson_state::kStateSyncWait1;
@@ -512,8 +310,7 @@ jetson::request_map() {
 /*---------------------------------------------------------------------------*/
 /** @brief  Task to receive and process receive data from Jetson             */
 /*---------------------------------------------------------------------------*/
-int
-jetson::receive_task( void *arg ) {
+int jetson::receive_task( void *arg ) {
     if( arg == NULL)
       return(0);
       
@@ -538,17 +335,6 @@ jetson::receive_task( void *arg ) {
       }
       _crc32_table[i] = crc_accum;
     }  
- 
-#if 0
-    Brain.Screen.clearScreen();   //<cdo>
-    Brain.Screen.setCursor(1,1);  //<cdo>
-    for (int cnt=0; cnt<10; cnt++) {
-      Brain.Screen.print("                              ");
-      Brain.Screen.newLine();
-    }
-    Brain.Screen.clearScreen();   //<cdo>
-    Brain.Screen.setCursor(1,1);  //<cdo>
-#endif
 
     // process one character at a time
     // getchar() is blocking and will call yield internally

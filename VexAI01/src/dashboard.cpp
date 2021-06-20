@@ -1,6 +1,8 @@
 #include "vex.h"
 #include "MysteryGang/RobotConfig.h"
 
+//#define ENABLE_COMM_DBG
+
 static vex::mutex sBoxLock;
 static int   sCurClassId = 0;
 static int   sCurX       = 0;
@@ -11,6 +13,7 @@ static float sCurDepthI  = 0.0;
 static bool  sHasTargets = false;
 
 static int sLeftRight = 0;      //lr: 0=notDetected | 1=left | 2=right | 3=onTarget
+
 
 void setJetsonDisplay(int lr) {
   sLeftRight = lr;
@@ -71,8 +74,7 @@ static void dashboardJetson() {
   hwBrain.Screen.newLine();
 }
 
-static void
-dashboardJetson( int ox, int oy, int width, int height ) {
+static void dashboardJetson( int ox, int oy, int width, int height ) {
   static int32_t     last_data = 0;
   static int32_t     last_packets = 0;
   static int32_t     total_data = 0;
@@ -81,7 +83,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
   static MAP_RECORD  local_map;
   color grey = vex::color(0x404040);
 
-#if 0
+#ifdef ENABLE_COMM_DBG
   Brain.Screen.setClipRegion( ox, oy, width, height);
   Brain.Screen.setFont( mono15 );
   // border and titlebar
@@ -95,7 +97,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
 #endif
   oy += 20;
   
-#if 0
+#ifdef ENABLE_COMM_DBG
   Brain.Screen.setPenColor( white );
   Brain.Screen.setFillColor( black );
 #endif
@@ -103,7 +105,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
   // get last map data
   jetson_comms.get_data( &local_map );
 
-#if 0
+#ifdef ENABLE_COMM_DBG
   Brain.Screen.printAt( ox + 10, oy += 15, "Packets   %d", jetson_comms.get_packets() );
   Brain.Screen.printAt( ox + 10, oy += 15, "Errors    %d", jetson_comms.get_errors() );
   Brain.Screen.printAt( ox + 10, oy += 15, "Timeouts  %d", jetson_comms.get_timeouts() );
@@ -134,7 +136,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
       widthI = local_map.boxobj[i].width / 25.4;
       heightI = local_map.boxobj[i].height / 25.4;
       depthI = local_map.boxobj[i].depth / 25.4;
-#if 0
+#ifdef ENABLE_COMM_DBG
       Brain.Screen.printAt( ox + 10, oy += 12, "box %d: c:%d x:%d y:%d w:%.1f h:%.1f d:%.1f",i,
                            local_map.boxobj[i].classID, //Class ID (0 = Red 1 = Blue 2 = Goal)
                            local_map.boxobj[i].x, //in pixels
@@ -153,7 +155,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
       }
     }
     else {
-#if 0
+#ifdef ENABLE_COMM_DBG
       Brain.Screen.printAt( ox + 10, oy += 12, "---");
 #endif
     }
@@ -161,9 +163,9 @@ dashboardJetson( int ox, int oy, int width, int height ) {
   if (hasValidTarget == false) {
     setBoxData(1, 0, 0, 0.0, 0.0, 0.0);
   }
-  for(int i=0;i<4;i++ ) {
+  for (int i=0;i<4;i++ ) {
     if( i < local_map.mapnum ) {
-#if 0
+#ifdef ENABLE_COMM_DBG
       Brain.Screen.printAt( ox + 10, oy += 12, "map %d: a:%4d c:%4d X:%.2f Y:%.2f Z:%.1f",i,
                            local_map.mapobj[i].age,
                            local_map.mapobj[i].classID,
@@ -173,7 +175,7 @@ dashboardJetson( int ox, int oy, int width, int height ) {
 #endif
     }
     else {
-#if 0
+#ifdef ENABLE_COMM_DBG
       Brain.Screen.printAt( ox + 10, oy += 12, "---");
 #endif
     }
@@ -194,7 +196,7 @@ static void dashboardVexlink( int ox, int oy, int width, int height ) {
   color darkred = vex::color(0x800000);
   color darkgrn = vex::color(0x008000);
 
-#if 0
+#ifdef ENABLE_COMM_DBG
   Brain.Screen.setClipRegion( ox, oy, width, height);
   Brain.Screen.setFont( mono15 );
 
@@ -241,7 +243,7 @@ typedef struct {
   }
   Brain.Screen.setFillColor(black);
   Brain.Screen.setPenColor(white);
-#if 0
+#ifdef ENABLE_COMM_DBG
   Brain.Screen.printAt( ox + 10, oy += 15, "FrameCnt  %d", local_map.pos.framecnt );
   Brain.Screen.printAt( ox + 10, oy += 15, "Status    %d", local_map.pos.status );
   Brain.Screen.printAt( ox + 10, oy += 15, "x         %d", int(local_map.pos.x) );
@@ -264,7 +266,7 @@ int dashboardTask() {
     dashboardJetson(    0, 0, 280, 240 );
     dashboardVexlink( 279, 0, 201, 240 );
     // draw, at 30Hz
-#if 0
+#ifdef ENABLE_COMM_DBG
     Brain.Screen.render();
 #endif
     //this_thread::sleep_for(16*100);
