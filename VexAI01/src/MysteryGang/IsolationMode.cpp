@@ -99,8 +99,8 @@ namespace IsolationMode {
         Cpm::startMiddleIntake();
         LimitSwitchD.pressed(Cpm::stopBottomIntakes);
         LimitSwitchD.pressed(Cpm::stopMiddleIntake);
-        }
-     }
+      }
+    }
     //setJetsonDisplay(leftRight);
   }
 

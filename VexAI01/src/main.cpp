@@ -137,17 +137,12 @@ int main() {
   CurConfig::displayConfigBrain();
   CurConfig::displayConfigController();
 
-  // local storage for latest data from the Jetson Nano
-  static MAP_RECORD       local_map;
+  int32_t loop_time = 66;     // Run at about 15Hz
 
-  // RUn at about 15Hz
-  int32_t loop_time = 66;
-
-  // start the status update display
-  thread t1(dashboardTask);
-
+  thread t1(dashboardTask);   // Start the status update display
   thread t2(IsolationMode::controlTask);
-  thread t3(InteractiveMode::controlTask);
+  //thread t3(InteractiveMode::controlTask);
+
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);
   //enterUserControl();
