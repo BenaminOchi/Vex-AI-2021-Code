@@ -8,8 +8,8 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
-bumper BumperC = bumper(Brain.ThreeWirePort.C);
-limit LimitSwitchD = limit(Brain.ThreeWirePort.D);
+limit LimitSwitchE = limit(Brain.ThreeWirePort.C);
+bumper BumperC = bumper(Brain.ThreeWirePort.A);
 
 // VEXcode generated functions
 

@@ -3,8 +3,8 @@ using namespace vex;
 extern brain Brain;
 
 // VEXcode devices
+extern limit LimitSwitchE;
 extern bumper BumperC;
-extern limit LimitSwitchD;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

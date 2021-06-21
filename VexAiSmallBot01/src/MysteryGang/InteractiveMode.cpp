@@ -58,8 +58,8 @@ namespace InteractiveMode {
         Cpm::coastWheels();
       }
       else {
-        LimitSwitchD.pressed(Cpm::setLimitSwitchPressed);
-        BumperC.pressed(Cpm::setBumperSwitchPressed);
+        LimitSwitchE.pressed(Cpm::setLimitSwitchPressed);
+        //BumperC.pressed(Cpm::setBumperSwitchPressed);
         if (Cpm::wasLimitSwitchPressed() == true) {
           Cpm::stopAllMotors();
           sIsTracking = false;

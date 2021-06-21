@@ -55,8 +55,8 @@ namespace IsolationMode {
         Cpm::coastWheels();
       }
       else {
-        LimitSwitchD.pressed(Cpm::setLimitSwitchPressed);
-        BumperC.pressed(Cpm::setBumperSwitchPressed);
+        LimitSwitchE.pressed(Cpm::setLimitSwitchPressed);
+        //BumperC.pressed(Cpm::setBumperSwitchPressed);
         if (Cpm::wasLimitSwitchPressed() == true) {
           Cpm::stopAllMotors();
           vex::task::sleep(3000);
@@ -160,35 +160,4 @@ namespace IsolationMode {
     sIsTaskSuspended = true;
   }
 
-  void testCpm() {
-    Cpm::stopAllMotors();
-
-    Cpm::moveRobotForward(24);
-    vex::task::sleep(200);
-    Cpm::turnRobotLeft(135);
-    vex::task::sleep(200);
-    Cpm::moveRobotForward(500);
-    vex::task::sleep(200);
-    Cpm::moveRobotBackward(500);
-    vex::task::sleep(200);
-    Cpm::turnRobotLeft(2000);
-    vex::task::sleep(200);
-    Cpm::turnRobotRight(2000);
-    vex::task::sleep(200);
-    Cpm::startAllIntakes();
-    vex::task::sleep(500);
-    Cpm::stopAllIntakes();
-    vex::task::sleep(1000);
-    Cpm::startBottomIntakes();
-    vex::task::sleep(500);
-    Cpm::stopBottomIntakes();
-    vex::task::sleep(1000);
-    Cpm::startMiddleIntake();
-    vex::task::sleep(500);
-    Cpm::stopMiddleIntake();
-    vex::task::sleep(1000);
-    Cpm::startTopIntakes();
-    vex::task::sleep(500);
-    Cpm::stopTopIntakes();
-  }
 }
