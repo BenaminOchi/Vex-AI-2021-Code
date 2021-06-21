@@ -6,7 +6,7 @@
 static int sLeftRight = 0;      //lr: 0=notDetected | 1=left | 2=right | 3=onTarget
 
 
-void setJetsonDisplay(int lr) {
+void updateJetsonDisplayLr(int lr) {
   sLeftRight = lr;
 }
 
