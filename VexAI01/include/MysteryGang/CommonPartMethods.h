@@ -31,6 +31,8 @@ namespace Cpm {
   // Move the robot forwards for the specified amount of time
   void moveRobotForward(unsigned int numInches);
 
+  void startWheels();
+
   // Move the robot forwards for the specified motor rotations and move treads to pull in cubes at the same time
   void moveRobotForwardAndIntake(int rotationsInDegrees);
 
@@ -80,6 +82,14 @@ namespace Cpm {
   void startTopIntakes();
 
   void stopTopIntakes();
+
+  void startAllIntakesReverse();
+
+  void startBottomIntakesReverse();
+
+  void startMiddleIntakeReverse();
+
+  void startTopIntakesReverse();
 
   bool wasLimitSwitchPressed();
 

@@ -157,18 +157,25 @@ namespace Cpm {
   void moveRobotForward(unsigned int numInches) {
     // Move forward
     int numMillisecs = numInches *  50;
-    int leftMotorSpeed;
-    int rightMotorSpeed;
+    int motorSpeed = 40;
 
-    leftMotorSpeed = 40;
-    rightMotorSpeed = 40;
-    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
     
     stopWheels();
+  }
+
+  void startWheels() {
+    // Move forward
+    int motorSpeed = 40;
+
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct); 
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
   }
 
   void moveRobotBackward(unsigned int numInches) {
@@ -193,7 +200,7 @@ namespace Cpm {
     //hwMotorWheelFrontLeft.resetPosition();
     //hwMotorWheelBackLeft.resetPosition();
 
-    double numMillisecs = numDegrees * 30;
+    double numMillisecs = numDegrees * 29.63;
     int leftMotorSpeed = 10;
     int rightMotorSpeed = 10;
     hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
@@ -265,6 +272,31 @@ namespace Cpm {
   void stopTopIntakes() {
     hwMotorIntakeLifter.stop();
     hwMotorPusher.stop();
+  }
+
+  void startAllIntakesReverse() {
+    int motorSpeed = 150;
+    hwMotorIntakeLeft.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeRight.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeLifter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+  }
+
+  void startBottomIntakesReverse() {
+    int motorSpeed = 150;
+    hwMotorIntakeLeft.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeRight.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+  }
+
+  void startMiddleIntakeReverse() {
+    int motorSpeed = 150;
+    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
+  }
+
+  void startTopIntakesReverse() {
+    int motorSpeed = 150;
+    hwMotorIntakeLifter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
   }
 
   static bool sLimitSwitchPressed = false;

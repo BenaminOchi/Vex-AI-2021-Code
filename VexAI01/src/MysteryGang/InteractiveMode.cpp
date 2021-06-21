@@ -147,6 +147,7 @@ namespace InteractiveMode {
       if (sIsTaskSuspended == true) {
         break;
       }
+      vex::task::sleep(1);  // Allow detection of competition switch, etc.
     }
     return 0;
   }

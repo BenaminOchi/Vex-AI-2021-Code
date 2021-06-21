@@ -16,6 +16,9 @@
 //
 ai::jetson  jetson_comms;
 
+static bool sFirstAutoFlag = true;
+
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                          Auto_Isolation Task                              */
@@ -61,8 +64,6 @@ void auto_Interaction(void) {
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-bool firstAutoFlag = true;
-
 void autonomousMain(void) {
   // ..........................................................................
   // The first time we enter this function we will launch our Isolation routine
@@ -71,12 +72,17 @@ void autonomousMain(void) {
   // and we will enter the interaction period. 
   // ..........................................................................
 
-  if (firstAutoFlag)
+  if (sFirstAutoFlag) {
+    hwBrain.Screen.print("Enter Isolation Mode");
+    hwBrain.Screen.newLine();
     auto_Isolation();
-  else 
+  }
+  else { 
+    hwBrain.Screen.print("Enter Interactive Mode");
+    hwBrain.Screen.newLine();
     auto_Interaction();
-
-  firstAutoFlag = false;
+  }
+  sFirstAutoFlag = false;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -122,8 +128,8 @@ int main() {
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-  //thread tDash(dashboardTask);   // Start the status update display
-  //tDash.setPriority(thread::threadPrioritylow);
+  thread tDash(dashboardTask);   // Start the status update display
+  tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);

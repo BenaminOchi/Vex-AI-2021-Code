@@ -2,10 +2,30 @@
 #include "MysteryGang/RobotConfig.h"
 
 
+const unsigned int BALL_UNDEFINED = 0;
+const unsigned int BALL_RED = 10;
+const unsigned int BALL_BLUE = 20;
+const unsigned int GOAL = 30;
+
+bool isBallRed(int classId) {
+  if ((classId >= BALL_RED) && (classId < BALL_BLUE)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool isBallBlue(int classId) {
+  if ((classId >= BALL_BLUE) && (classId < GOAL)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, float* heightI, float* depthI) {
-  const unsigned int RED_BALL = 0;
-  const unsigned int BLUE_BALL = 1;
   static MAP_RECORD  localMap;
   bool hasValidTarget = false;
 
@@ -13,7 +33,7 @@ void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, fl
 
   for (int i=0;i<4;i++) {
     if (i < localMap.boxnum) {
-      if (localMap.boxobj[i].classID == RED_BALL) {
+      if (isBallRed(localMap.boxobj[i].classID)) {    //TBD: Update to support blue balls
         hasValidTarget = true;
         *classId    = localMap.boxobj[i].classID;
         *x          = localMap.boxobj[i].x;

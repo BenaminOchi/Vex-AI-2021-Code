@@ -59,6 +59,12 @@ namespace IsolationMode {
         BumperC.pressed(Cpm::setBumperSwitchPressed);
         if (Cpm::wasLimitSwitchPressed() == true) {
           Cpm::stopAllMotors();
+          vex::task::sleep(3000);
+          //Cpm::clearLimitSwitchPressed();
+          //vex::task::sleep(3000);
+          //Cpm::startTopIntakesReverse();
+          //vex::task::sleep(500);
+          //Cpm::stopTopIntakes();
           sIsTracking = false;
         }
         if (Cpm::wasBumperSwitchPressed() == true) {
@@ -123,6 +129,7 @@ namespace IsolationMode {
     Cpm::moveRobotForward(24);
     vex::task::sleep(200);
     Cpm::turnRobotLeft(135);
+    //Cpm::turnRobotRight(135);
 
     // Enter the main control loop
     while (true) {
@@ -144,6 +151,7 @@ namespace IsolationMode {
       if (sIsTaskSuspended == true) {
         break;
       }
+      vex::task::sleep(1);  // Allow detection of competition switch, etc.
     }
     return 0;
   }
