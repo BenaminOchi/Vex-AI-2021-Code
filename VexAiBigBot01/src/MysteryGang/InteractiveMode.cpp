@@ -3,7 +3,7 @@
 #include "MysteryGang/IsolationMode.h"
 #include "MysteryGang/RobotConfig.h"
 
-extern void setJetsonDisplay(int lr);
+extern void updateJetsonDisplayLr(int lr);
 extern void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, float* heightI, float* depthI);
 
 static const char* sBuildDate = __DATE__;
@@ -113,7 +113,7 @@ namespace InteractiveMode {
         sIsTargetInRange = true;
       }
     }
-    setJetsonDisplay(leftRight);
+    updateJetsonDisplayLr(leftRight);
   }
 
   //-----------------------
