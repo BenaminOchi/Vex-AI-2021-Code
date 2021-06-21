@@ -122,6 +122,7 @@ void testLimitSwitchPressed() {
 }
 
 void testCpm() {
+  /*
   Cpm::stopAllMotors();
   Cpm::moveRobotForward(24);
   vex::task::sleep(200);
@@ -150,6 +151,7 @@ void testCpm() {
   Cpm::startTopIntakes();
   vex::task::sleep(500);
   Cpm::stopTopIntakes();
+  */
   LimitSwitchE.pressed(testLimitSwitchPressed);
   BumperC.pressed(testLimitSwitchPressed);
 }

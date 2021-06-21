@@ -14,14 +14,14 @@ namespace IsolationMode {
 
   enum StateMachineType {
     STATE_UNUSED,
-	STATE_INIT,
+    STATE_INIT,
     STATE_TRACK_FIRST_TARGET,
-	STATE_DONE
+    STATE_DONE
   };
 
   StateMachineType sCurState = STATE_INIT;
 
-  static bool sHasTarget       = false;
+  static bool  sHasTarget      = false;
   static int   sCurClassId     = 0;
   static int   sCurX           = 0;
   static int   sCurY           = 0;
@@ -77,7 +77,7 @@ namespace IsolationMode {
           Cpm::coastWheels();
         }
         else {
-          LimitSwitchD.pressed(Cpm::setLimitSwitchPressed);
+          LimitSwitchE.pressed(Cpm::setLimitSwitchPressed);
           BumperC.pressed(Cpm::setBumperSwitchPressed);
           if (Cpm::wasLimitSwitchPressed() == true) {
             Cpm::stopAllMotors();
@@ -182,35 +182,4 @@ namespace IsolationMode {
     sIsTaskSuspended = true;
   }
 
-  void testCpm() {
-    Cpm::stopAllMotors();
-
-    Cpm::moveRobotForward(24);
-    vex::task::sleep(200);
-    Cpm::turnRobotLeft(135);
-    vex::task::sleep(200);
-    Cpm::moveRobotForward(500);
-    vex::task::sleep(200);
-    Cpm::moveRobotBackward(500);
-    vex::task::sleep(200);
-    Cpm::turnRobotLeft(2000);
-    vex::task::sleep(200);
-    Cpm::turnRobotRight(2000);
-    vex::task::sleep(200);
-    Cpm::startAllIntakes();
-    vex::task::sleep(500);
-    Cpm::stopAllIntakes();
-    vex::task::sleep(1000);
-    Cpm::startBottomIntakes();
-    vex::task::sleep(500);
-    Cpm::stopBottomIntakes();
-    vex::task::sleep(1000);
-    Cpm::startMiddleIntake();
-    vex::task::sleep(500);
-    Cpm::stopMiddleIntake();
-    vex::task::sleep(1000);
-    Cpm::startTopIntakes();
-    vex::task::sleep(500);
-    Cpm::stopTopIntakes();
-  }
 }
