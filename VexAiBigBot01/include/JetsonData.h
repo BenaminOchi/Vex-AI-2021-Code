@@ -10,6 +10,9 @@ namespace JetsonData {
   };
 
   void getBoxData(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI);
+  bool isBallBlue(int classId);
+  bool isBallRed(int classId);
+  bool isGoal(int classId);
 }
 
 #endif

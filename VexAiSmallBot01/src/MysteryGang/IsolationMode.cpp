@@ -69,8 +69,8 @@ namespace IsolationMode {
     float curWidthI      = 0.0;
     float curHeightI     = 0.0;
     float curDepthI      = 0.0;
-    bool sIsTracking = true;
-    bool sIsTargetInRange = false;
+    static bool sIsTracking = true;
+    static bool sIsTargetInRange = false;
     int dbgLeftRight = 3;  // Default to: pointing at target
 
     if (sIsTracking == true) {
@@ -164,8 +164,8 @@ namespace IsolationMode {
     float curWidthI      = 0.0;
     float curHeightI     = 0.0;
     float curDepthI      = 0.0;
-    bool sIsTracking = true;
-    bool sIsTargetInRange = false;
+    static bool sIsTracking = true;
+    static bool sIsTargetInRange = false;
     int dbgLeftRight = 3;  // Default to: pointing at target
     JetsonData::ClassIdType ourBall = JetsonData::BALL_RED;   // TBD: Need to use red/blue ball based on team
 
