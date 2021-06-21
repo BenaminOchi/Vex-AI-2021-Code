@@ -1,7 +1,7 @@
 #include "vex.h"
 #include "MysteryGang/RobotConfig.h"
 
-
+// TBD - Use enum
 const unsigned int BALL_UNDEFINED = 0;
 const unsigned int BALL_RED = 10;
 const unsigned int BALL_BLUE = 20;
@@ -42,6 +42,7 @@ void getBoxData(bool* hasTarget, int* classId, int* x, int* y, float* widthI, fl
         *heightI    = localMap.boxobj[i].height / 25.4;
         *depthI     = localMap.boxobj[i].depth / 25.4;
         *hasTarget  = true;
+        break;
       }
     }
     else {
