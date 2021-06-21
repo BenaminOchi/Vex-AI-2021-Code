@@ -119,9 +119,13 @@ void enterUserControl(void) {
 /*---------------------------------------------------------------------------*/
 void testLimitSwitchPressed() {
   Cpm::startTopIntakes();
+  vex::task::sleep(1000);
+  Cpm::stopAllIntakes();
+  Cpm::startWheels();
 }
 
 void testCpm() {
+  /*
   Cpm::stopAllMotors();
   Cpm::moveRobotForward(24);
   vex::task::sleep(200);
@@ -150,8 +154,9 @@ void testCpm() {
   Cpm::startTopIntakes();
   vex::task::sleep(500);
   Cpm::stopTopIntakes();
-  LimitSwitchE.pressed(testLimitSwitchPressed);
-  BumperC.pressed(testLimitSwitchPressed);
+  */
+  hwLimit.pressed(testLimitSwitchPressed);
+  hwBumper.pressed(testLimitSwitchPressed);
 }
 /*---------------------------------------------------------------------------*/
 
@@ -167,8 +172,8 @@ int main() {
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-  thread tDash(dashboardTask);   // Start the status update display
-  tDash.setPriority(thread::threadPrioritylow);
+  //thread tDash(dashboardTask);   // Start the status update display
+  //tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);
