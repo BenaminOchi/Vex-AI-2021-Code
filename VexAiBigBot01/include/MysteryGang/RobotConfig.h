@@ -6,11 +6,10 @@
 
 // VEXcode devices
 extern vex::brain       hwBrain;
+extern vex::bumper      hwBumper;
 extern vex::competition hwCompetition;
 extern vex::controller  hwController;
-extern vex::encoder     hwEncoderPusher;
-extern vex::encoder     hwEncoderWheels;
-extern vex::encoder     hwEncoderGh;  // Currently unused, encoder attached to right wheel
+extern vex::limit       hwLimit;
 extern vex::motor       hwMotorWheelFrontLeft;
 extern vex::motor       hwMotorWheelFrontRight;
 extern vex::motor       hwMotorWheelBackLeft;

@@ -54,8 +54,8 @@ namespace IsolationMode {
   void performStateInit() {
     Cpm::moveRobotForward(24);
     vex::task::sleep(200);
-    Cpm::turnRobotLeft(135);
-    //Cpm::turnRobotRight(135);
+    //Cpm::turnRobotLeft(135);
+    Cpm::turnRobotRight(135);
   }
 
   void performStateTrackFirstTarget() {
@@ -77,8 +77,8 @@ namespace IsolationMode {
           Cpm::coastWheels();
         }
         else {
-          LimitSwitchE.pressed(Cpm::setLimitSwitchPressed);
-          BumperC.pressed(Cpm::setBumperSwitchPressed);
+          hwLimit.pressed(Cpm::setLimitSwitchPressed);
+          hwBumper.pressed(Cpm::setBumperSwitchPressed);
           if (Cpm::wasLimitSwitchPressed() == true) {
             Cpm::stopAllMotors();
             vex::task::sleep(3000);
@@ -88,6 +88,7 @@ namespace IsolationMode {
             //vex::task::sleep(500);
             //Cpm::stopTopIntakes();
             sIsTracking = false;
+            sCurState = STATE_DONE;
           }
           if (Cpm::wasBumperSwitchPressed() == true) {
             Cpm::stopAllMotors();
@@ -153,7 +154,6 @@ namespace IsolationMode {
       break;
     case STATE_TRACK_FIRST_TARGET :
       performStateTrackFirstTarget();
-      sCurState = STATE_DONE;
       break;
     default :
       break;
