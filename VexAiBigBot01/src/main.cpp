@@ -119,6 +119,9 @@ void enterUserControl(void) {
 /*---------------------------------------------------------------------------*/
 void testLimitSwitchPressed() {
   Cpm::startTopIntakes();
+  vex::task::sleep(1000);
+  Cpm::stopAllIntakes();
+  Cpm::startWheels();
 }
 
 void testCpm() {

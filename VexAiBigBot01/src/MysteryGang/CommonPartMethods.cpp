@@ -1,7 +1,11 @@
 #include "MysteryGang/CommonPartMethods.h"
 #include "MysteryGang/RobotConfig.h"
 
+
 namespace Cpm {
+  static bool sLimitSwitchPressed = false;
+  static bool sBumperSwitchPressed = false;
+
   void stopAllMotors() {
     stopWheels();
     stopAllIntakes();
@@ -76,7 +80,7 @@ namespace Cpm {
 
   void turnRobotRight(unsigned int numDegrees) {
     // Turn right
-    double numMillisecs = numDegrees * 30;
+    double numMillisecs = numDegrees * 29.63;
     int leftMotorSpeed = 10;
     int rightMotorSpeed = 10;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
@@ -159,7 +163,6 @@ namespace Cpm {
     hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
   }
 
-  static bool sLimitSwitchPressed = false;
   bool wasLimitSwitchPressed() {
     return sLimitSwitchPressed;
   }
@@ -172,7 +175,6 @@ namespace Cpm {
     sLimitSwitchPressed = false;
   }
 
-  static bool sBumperSwitchPressed = false;
   bool wasBumperSwitchPressed() {
     return sBumperSwitchPressed;
   }
