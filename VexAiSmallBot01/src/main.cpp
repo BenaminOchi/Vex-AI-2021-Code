@@ -118,10 +118,7 @@ void enterUserControl(void) {
 
 /*---------------------------------------------------------------------------*/
 void testLimitSwitchPressed() {
-  Cpm::startTopIntakes();
-  vex::task::sleep(1000);
   Cpm::stopAllIntakes();
-  Cpm::startWheels();
 }
 
 void testCpm() {
@@ -155,6 +152,7 @@ void testCpm() {
   vex::task::sleep(500);
   Cpm::stopTopIntakes();
   */
+  Cpm::startAllIntakes();
   hwLimit.pressed(testLimitSwitchPressed);
   hwBumper.pressed(testLimitSwitchPressed);
 }
@@ -172,21 +170,21 @@ int main() {
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-  //thread tDash(dashboardTask);   // Start the status update display
-  //tDash.setPriority(thread::threadPrioritylow);
+  thread tDash(dashboardTask);   // Start the status update display
+  tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
-  //hwCompetition.autonomous(autonomousMain);
+  //hwCompetition.autonomous(autonomousMain);  // This is the real deal for COMPETITION
   IsolationMode::enterMain();  // TEMP for debug
   //enterUserControl();          // TEMP for debug
+
+  //testCpm();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
     // request new data    
     // NOTE: This request should only happen in a single task.    
     jetson_comms.request_map();
-
-    //testCpm();
 
     // Allow other tasks to run
     this_thread::sleep_for(loop_time);

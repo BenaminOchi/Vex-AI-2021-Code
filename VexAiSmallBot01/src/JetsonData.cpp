@@ -5,6 +5,15 @@
 
 namespace JetsonData {
 
+  enum JetsonCommClassIdType {
+    JC_BALL_UNDEFINED         = 0,
+    JC_BALL_RED_OUT_OF_GOAL   = 10,
+    JC_BALL_RED_IN_GOAL       = 11,
+    JC_BALL_BLUE_OUT_OF_GOAL  = 20,
+    JC_BALL_BLUE_IN_GOAL      = 21,
+    JC_GOAL                   = 30
+  };
+
   void getBoxData(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI) {
     static MAP_RECORD  sLocalMap;
     bool hasValidTarget = false;
@@ -13,7 +22,9 @@ namespace JetsonData {
 
     for (int i=0;i<4;i++) {
       if (i < sLocalMap.boxnum) {
-        if (sLocalMap.boxobj[i].classID == classId) {
+        if ((isBallRed(sLocalMap.boxobj[i].classID) && isBallRed(classId)) ||
+            (isBallBlue(sLocalMap.boxobj[i].classID) && isBallBlue(classId)) ||
+            (isGoal(sLocalMap.boxobj[i].classID) && isGoal(classId))) {
           hasValidTarget = true;
           *x          = sLocalMap.boxobj[i].x;
           *y          = sLocalMap.boxobj[i].y;
