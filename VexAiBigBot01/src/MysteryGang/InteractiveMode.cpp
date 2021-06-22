@@ -1,5 +1,6 @@
 #include "JetsonData.h"
 #include "MysteryGang/CommonPartMethods.h"
+#include "MysteryGang/CurConfig.h"
 #include "MysteryGang/InteractiveMode.h"
 #include "MysteryGang/IsolationMode.h"
 #include "MysteryGang/RobotConfig.h"
@@ -53,9 +54,8 @@ namespace InteractiveMode {
   }
 
   void performStateTrackFirstTarget() {
-    const unsigned int centerX = 320;
-    const int MaxSpeed = 7;
-    const int HalfSpeed = 4;
+    const int MaxSpeed   = 7;
+    const int HalfSpeed  = 4;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -96,22 +96,22 @@ namespace InteractiveMode {
           }
         }
       }
-      else if (curX <= (centerX - 100 * 2)) {
+      else if (curX <= (JetsonData::CenterX - 100 * 2)) {
         sLeftMotorSpeed = MaxSpeed * -1;
         sRightMotorSpeed = MaxSpeed;
         dbgLeftRight = 1;    // Left
       }
-      else if (curX >= (centerX + 100 * 2)) {
+      else if (curX >= (JetsonData::CenterX + 100 * 2)) {
         sLeftMotorSpeed = MaxSpeed;
         sRightMotorSpeed = MaxSpeed * -1;
         dbgLeftRight = 2;    // Right
       }
-      else if (curX <= (centerX - 60 * 2)) {
+      else if (curX <= (JetsonData::CenterX - 60 * 2)) {
         sLeftMotorSpeed = HalfSpeed *  -1;
         sLeftMotorSpeed = HalfSpeed;
         dbgLeftRight = 1;    // Left
       }
-      else if (curX >= (centerX + 60 * 2)) {
+      else if (curX >= (JetsonData::CenterX + 60 * 2)) {
         sLeftMotorSpeed = HalfSpeed;
         sRightMotorSpeed = HalfSpeed * -1;
         dbgLeftRight = 2;    // Right
