@@ -53,6 +53,7 @@ namespace IsolationMode {
     vex::task::sleep(500);
     Cpm::stopTopIntakes();
     Cpm::moveRobotBackward(24);
+    vex::task::sleep(1000);
   }
 
   void performStateInit() {
@@ -77,8 +78,8 @@ namespace IsolationMode {
     if (sRanOnce == false) {
       //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL");
       //hwBrain.Screen.newLine();
-      Cpm::clearLimitSwitchPressed();
-      Cpm::clearBumperSwitchPressed();
+      //Cpm::clearLimitSwitchPressed();
+      //Cpm::clearBumperSwitchPressed();
       sRanOnce = true;
     }
 
@@ -115,13 +116,13 @@ namespace IsolationMode {
         sLeftMotorSpeed = 40;
         sRightMotorSpeed = 40;
       }
-      else if (curDepthI >= 16) {
+      else if (curDepthI >= 8) {
         sLeftMotorSpeed = 30;
         sRightMotorSpeed = 30;
       }
       else {
-        sLeftMotorSpeed = 10;   // TBD
-        sRightMotorSpeed = 10;  // TBD
+        sLeftMotorSpeed = 20;   // TBD
+        sRightMotorSpeed = 20;  // TBD
         sCurState = STATE_TRACK_FIRST_GOAL_IN_RANGE;
       }
     }
@@ -141,22 +142,21 @@ namespace IsolationMode {
     if (sRanOnce == false) {
       //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL_IN_RANGE");
       //hwBrain.Screen.newLine();
-      Cpm::clearLimitSwitchPressed();
+      //Cpm::clearLimitSwitchPressed();
       Cpm::clearBumperSwitchPressed();
       sRanOnce = true;
     }
 
     if (sMoveForward == true) {
-      hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
+      //hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
       hwBumper.pressed(Cpm::setBumperSwitchPressed);  // TBD - Use Cpm
       sMoveForward = false;
     }
 
-    if ((Cpm::wasLimitSwitchPressed() == true) || (Cpm::wasBumperSwitchPressed() == true)) {
+    if (Cpm::wasBumperSwitchPressed() == true) {
+      Cpm::stopWheels();
       Cpm::startAllIntakes();
-      vex::task::sleep(1000);
-      Cpm::stopBottomIntakes();
-      vex::task::sleep(2000);
+      vex::task::sleep(5000);
       Cpm::stopAllMotors();
       sCurState = STATE_DONE;
     }
@@ -221,8 +221,8 @@ namespace IsolationMode {
         sRightMotorSpeed = 30;
       }
       else {
-        sLeftMotorSpeed = 15;
-        sRightMotorSpeed = 15;
+        sLeftMotorSpeed = 20;
+        sRightMotorSpeed = 20;
         Cpm::startBottomIntakes();
         Cpm::startMiddleIntake();
         sCurState = STATE_TRACK_FIRST_TARGET_IN_RANGE;
