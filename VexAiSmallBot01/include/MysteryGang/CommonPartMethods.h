@@ -60,5 +60,7 @@ namespace Cpm {
   void clearBumperSwitchPressed();
 
   void coastWheels();
+
+  void stopWithCoast();
 }
 #endif

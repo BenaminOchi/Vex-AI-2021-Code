@@ -60,13 +60,13 @@ namespace Cpm {
   }
 
   void turnRobotLeft(unsigned int numDegrees) {
-    // Turn left
+    const unsigned int speedMultiplier = 2;
     //hwMotorWheelFrontLeft.resetPosition();
     //hwMotorWheelBackLeft.resetPosition();
 
-    double numMillisecs = numDegrees * 29.63;
-    int leftMotorSpeed = 10;
-    int rightMotorSpeed = 10;
+    double numMillisecs = numDegrees * 29.63 / speedMultiplier;
+    int leftMotorSpeed = 10 * speedMultiplier;
+    int rightMotorSpeed = 10 * speedMultiplier;
     hwMotorWheelFrontLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct); 
     hwMotorWheelBackLeft.spin(vex::directionType::rev, leftMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelFrontRight.spin(vex::directionType::fwd, rightMotorSpeed, vex::velocityUnits::pct);
@@ -79,10 +79,10 @@ namespace Cpm {
   }
 
   void turnRobotRight(unsigned int numDegrees) {
-    // Turn right
-    double numMillisecs = numDegrees * 29.63;
-    int leftMotorSpeed = 10;
-    int rightMotorSpeed = 10;
+    const unsigned int speedMultiplier = 2;
+    double numMillisecs = numDegrees * 29.63 / speedMultiplier;
+    int leftMotorSpeed = 10 * speedMultiplier;
+    int rightMotorSpeed = 10 * speedMultiplier;
     hwMotorWheelFrontLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct); 
     hwMotorWheelBackLeft.spin(vex::directionType::fwd, leftMotorSpeed, vex::velocityUnits::pct);
     hwMotorWheelFrontRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
@@ -192,5 +192,11 @@ namespace Cpm {
     hwMotorWheelBackLeft.setStopping(vex::brakeType::coast);
     hwMotorWheelFrontRight.setStopping(vex::brakeType::coast);
     hwMotorWheelBackRight.setStopping(vex::brakeType::coast);
+  }
+
+  void stopWithCoast(int numMillisecs) {
+    coastWheels();
+    vex::task::sleep(numMillisecs);
+    stopWheels();
   }
 }
