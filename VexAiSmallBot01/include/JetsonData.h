@@ -6,7 +6,8 @@ namespace JetsonData {
     BALL_UNDEFINED = 0,
     BALL_RED = 10,
     BALL_BLUE = 20,
-    GOAL = 30
+    GOAL = 30, 
+    GOAL_DESCORE_RED = 32
   };
 
   const unsigned int CenterX = 320;
@@ -17,6 +18,7 @@ namespace JetsonData {
   bool isBallBlue(int classId);
   bool isBallRed(int classId);
   bool isGoal(int classId);
+  bool isGoalDescoreRed(int classId);
 }
 
 #endif

@@ -175,7 +175,7 @@ int main() {
 
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);  // This is the real deal for COMPETITION
-  IsolationMode::enterMain();  // TEMP for debug
+  InteractiveMode::enterMain();  // TEMP for debug
   //enterUserControl();          // TEMP for debug
 
   //testCpm();

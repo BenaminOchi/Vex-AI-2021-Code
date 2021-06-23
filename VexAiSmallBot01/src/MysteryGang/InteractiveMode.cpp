@@ -58,10 +58,10 @@ namespace InteractiveMode {
   }
 
   void performStateInit() {
-    Cpm::moveRobotForward(24);
+    //Cpm::moveRobotForward(24);
     vex::task::sleep(200);
     //Cpm::turnRobotLeft(135);
-    Cpm::turnRobotRight(135);
+    //Cpm::turnRobotRight(135);
   }
 
   void performStateTrackFirstGoal() {
@@ -89,6 +89,8 @@ namespace InteractiveMode {
 
     if (hasTarget == false) {
       dbgLeftRight = 0;    // no valid target
+      sLeftMotorSpeed = (HalfSpeed * -1)/2;
+      sRightMotorSpeed = (HalfSpeed)/2;
       Cpm::coastWheels();
     }
     else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
@@ -276,7 +278,7 @@ namespace InteractiveMode {
     switch (sCurState) {
     case STATE_INIT :
       performStateInit();
-      sCurState = STATE_TRACK_FIRST_TARGET;
+      sCurState = STATE_TRACK_FIRST_GOAL;
       break;
     case STATE_TRACK_FIRST_TARGET :
       performStateTrackFirstTarget();

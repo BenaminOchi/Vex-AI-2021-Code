@@ -11,7 +11,8 @@ namespace JetsonData {
     JC_BALL_RED_IN_GOAL       = 11,
     JC_BALL_BLUE_OUT_OF_GOAL  = 20,
     JC_BALL_BLUE_IN_GOAL      = 21,
-    JC_GOAL                   = 30
+    JC_GOAL                   = 30,
+    JC_GOAL_DESCORE_RED       = 32
   };
 
   void getBoxData(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI) {
@@ -68,6 +69,15 @@ namespace JetsonData {
 
   bool isGoal(int classId) {
     if (classId >= GOAL) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  bool isGoalDescoreRed(int classId) {
+    if (classId == 32) {
       return true;
     }
     else {

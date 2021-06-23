@@ -24,7 +24,8 @@ namespace JetsonData {
       if (i < sLocalMap.boxnum) {
         if ((isBallRed(sLocalMap.boxobj[i].classID) && isBallRed(classId)) ||
             (isBallBlue(sLocalMap.boxobj[i].classID) && isBallBlue(classId)) ||
-            (isGoal(sLocalMap.boxobj[i].classID) && isGoal(classId))) {
+            (isGoal(sLocalMap.boxobj[i].classID) && isGoal(classId)) ||
+            (isGoalDescoreRed(sLocalMap.boxobj[i].classID) && isGoalDescoreRed(classId)) {
           hasValidTarget = true;
           *x          = sLocalMap.boxobj[i].x;
           *y          = sLocalMap.boxobj[i].y;
@@ -67,7 +68,16 @@ namespace JetsonData {
   }
 
   bool isGoal(int classId) {
-    if (classId >= GOAL) {
+    if (classId == GOAL) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  bool isGoalDescoreRed(int classId) {
+    if (classId == 32) {
       return true;
     }
     else {
