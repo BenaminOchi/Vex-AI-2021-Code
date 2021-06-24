@@ -16,7 +16,7 @@ extern vex::motor       hwMotorWheelBackLeft;
 extern vex::motor       hwMotorWheelBackRight;
 extern vex::motor       hwMotorIntakeLeft;
 extern vex::motor       hwMotorIntakeRight;
-extern vex::motor       hwMotorIntakeLifter;
-extern vex::motor       hwMotorPusher;
+extern vex::motor       hwMotorIntakeMiddle;
+extern vex::motor       hwMotorIntakeShooter;
 
 #endif

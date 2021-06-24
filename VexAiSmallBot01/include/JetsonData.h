@@ -16,6 +16,7 @@ namespace JetsonData {
 
 
   void getBoxData(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI);
+  void getBoxDataBallBlueInsideGoal(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI);
   void getBoxDataBallRedOutOfGoal(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI);
   int  getLastJetsonClassId();
   bool isBallBlue(int classId);

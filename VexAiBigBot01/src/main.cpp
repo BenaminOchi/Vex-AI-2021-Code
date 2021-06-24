@@ -228,8 +228,8 @@ int main() {
   CurConfig::initialize();
   CurConfig::displayConfigBrain();
 
-  thread tDash(dashboardTask);   // Start the status update display
-  tDash.setPriority(thread::threadPrioritylow);
+  //thread tDash(dashboardTask);   // Start the status update display
+  //tDash.setPriority(thread::threadPrioritylow);
 
   // Set up callbacks for autonomous and driver control periods.
   //hwCompetition.autonomous(autonomousMain);  // This is the real deal for COMPETITION

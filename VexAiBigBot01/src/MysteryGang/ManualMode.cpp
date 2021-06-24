@@ -54,20 +54,20 @@ namespace ManualMode {
       // Move cube pull in treads based on buttonL1
       hwMotorIntakeLeft.spin(vex::directionType::fwd, sIntakeLeftMotorSpeed, vex::velocityUnits::pct);
       hwMotorIntakeRight.spin(vex::directionType::fwd, sIntakeRightMotorSpeed, vex::velocityUnits::pct);
-      hwMotorIntakeLifter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
-      hwMotorPusher.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeShooter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeMiddle.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
 
       // Move cube push out treads based on buttonL2
       hwMotorIntakeLeft.spin(vex::directionType::rev, sIntakeLeftMotorSpeed, vex::velocityUnits::pct);
       hwMotorIntakeRight.spin(vex::directionType::rev, sIntakeRightMotorSpeed, vex::velocityUnits::pct);
-      hwMotorIntakeLifter.spin(vex::directionType::rev, sLifterMotorSpeed, vex::velocityUnits::pct);
-      hwMotorPusher.spin(vex::directionType::rev, sPusherMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeShooter.spin(vex::directionType::rev, sLifterMotorSpeed, vex::velocityUnits::pct);
+      hwMotorIntakeMiddle.spin(vex::directionType::rev, sPusherMotorSpeed, vex::velocityUnits::pct);
 
       // Move cube pull in lifter based on buttonA/B
-      //hwMotorIntakeLifter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeShooter.spin(vex::directionType::fwd, sLifterMotorSpeed, vex::velocityUnits::pct);
 
       // Move pusher based on buttonR1/R2
-      //hwMotorPusher.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
+      //hwMotorIntakeMiddle.spin(vex::directionType::fwd, sPusherMotorSpeed, vex::velocityUnits::pct);
 
       // Short delay just in case we want to display something on the controller
       vex::task::sleep(1);

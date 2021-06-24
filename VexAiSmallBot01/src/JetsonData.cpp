@@ -60,6 +60,42 @@ namespace JetsonData {
     *hasTarget = hasValidTarget;
   }
 
+  void getBoxDataBallBlueInsideGoal(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI) {
+    static MAP_RECORD  sLocalMap;
+    bool hasValidTarget = false;
+    fifo_object_box* curBox;
+
+    jetson_comms.get_data(&sLocalMap);   // Get last map data
+
+    for (int cnt=0; cnt<6; cnt++) {
+      if (cnt < sLocalMap.boxnum) {
+        curBox = &sLocalMap.boxobj[cnt];
+        if ((curBox->classID == JC_BALL_BLUE_IN_GOAL) || (curBox->classID == JC_BALL_BLUE_GENERIC)) {
+          hasValidTarget = true;
+          *x          = curBox->x;
+          *y          = curBox->y;
+          *widthI     = curBox->width / 25.4;
+          *heightI    = curBox->height / 25.4;
+          *depthI     = curBox->depth / 25.4;
+          sLastJetsonClassId = curBox->classID;
+          break;
+        }
+      }
+      else {
+      }
+    }
+
+    if (hasValidTarget == false) {
+      *x          = 0;
+      *y          = 0;
+      *widthI     = 0.0;
+      *heightI    = 0.0;
+      *depthI     = 0.0;
+    }
+    *hasTarget = hasValidTarget;
+    sLastJetsonClassId = JC_UNDEFINED;
+  }
+
   void getBoxDataBallRedOutOfGoal(ClassIdType classId, bool* hasTarget, int* x, int* y, float* widthI, float* heightI, float* depthI) {
     static MAP_RECORD  sLocalMap;
     bool hasValidTarget = false;

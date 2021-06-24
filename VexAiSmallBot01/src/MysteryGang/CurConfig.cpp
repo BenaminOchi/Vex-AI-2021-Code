@@ -28,6 +28,14 @@ namespace CurConfig {
     hwBrain.Screen.newLine();
   }
 
+  JetsonData::ClassIdType getOpponentTeamBallColor() {
+    if (sOurTeamBallColor == JetsonData::BALL_RED) {
+      return JetsonData::BALL_BLUE;
+    }
+    else {
+      return JetsonData::BALL_RED;
+    }
+  }
   JetsonData::ClassIdType getOurTeamBallColor() {
     return sOurTeamBallColor;
   }

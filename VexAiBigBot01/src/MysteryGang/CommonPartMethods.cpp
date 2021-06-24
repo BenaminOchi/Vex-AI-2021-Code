@@ -96,15 +96,15 @@ namespace Cpm {
     int motorSpeed = 150;
     hwMotorIntakeLeft.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
     hwMotorIntakeRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
-    hwMotorIntakeLifter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
-    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeShooter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeMiddle.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
   }
 
   void stopAllIntakes() {
     hwMotorIntakeLeft.stop();
     hwMotorIntakeRight.stop();
-    hwMotorIntakeLifter.stop();
-    hwMotorPusher.stop();
+    hwMotorIntakeShooter.stop();
+    hwMotorIntakeMiddle.stop();
   }
 
   void startBottomIntakes() {
@@ -120,30 +120,30 @@ namespace Cpm {
 
   void startMiddleIntake() {
     int motorSpeed = 150;
-    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorIntakeMiddle.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
   }
 
   void stopMiddleIntake() {
-    hwMotorPusher.stop();
+    hwMotorIntakeMiddle.stop();
   }
 
   void startTopIntakes() {
     int motorSpeed = 150;
-    hwMotorIntakeLifter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
-    hwMotorPusher.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeShooter.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorIntakeMiddle.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
   }
 
   void stopTopIntakes() {
-    hwMotorIntakeLifter.stop();
-    hwMotorPusher.stop();
+    hwMotorIntakeShooter.stop();
+    hwMotorIntakeMiddle.stop();
   }
 
   void startAllIntakesReverse() {
     int motorSpeed = 150;
     hwMotorIntakeLeft.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
     hwMotorIntakeRight.spin(vex::directionType::rev, motorSpeed, vex::velocityUnits::pct);
-    hwMotorIntakeLifter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
-    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeShooter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeMiddle.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
   }
 
   void startBottomIntakesReverse() {
@@ -154,13 +154,13 @@ namespace Cpm {
 
   void startMiddleIntakeReverse() {
     int motorSpeed = 150;
-    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorIntakeMiddle.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
   }
 
   void startTopIntakesReverse() {
     int motorSpeed = 150;
-    hwMotorIntakeLifter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
-    hwMotorPusher.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
+    hwMotorIntakeShooter.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);    
+    hwMotorIntakeMiddle.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
   }
 
   bool wasLimitSwitchPressed() {

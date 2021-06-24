@@ -12,5 +12,5 @@ vex::motor       hwMotorWheelBackLeft   = vex::motor(PORT12, ratio18_1, false);
 vex::motor       hwMotorWheelBackRight  = vex::motor(PORT14, ratio18_1, true);
 vex::motor       hwMotorIntakeLeft      = vex::motor(PORT16, ratio18_1, false);
 vex::motor       hwMotorIntakeRight     = vex::motor(PORT17, ratio18_1, true);
-vex::motor       hwMotorIntakeLifter    = vex::motor(PORT18, ratio18_1, true);
-vex::motor       hwMotorPusher          = vex::motor(PORT19, ratio18_1, true);
+vex::motor       hwMotorIntakeShooter   = vex::motor(PORT18, ratio18_1, true);
+vex::motor       hwMotorIntakeMiddle    = vex::motor(PORT19, ratio18_1, true);

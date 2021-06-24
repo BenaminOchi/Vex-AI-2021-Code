@@ -82,6 +82,11 @@ namespace IsolationMode {
   void centerOnTarget(StateMachineType nextState) {
     const int MaxSpeed   = 7;
     const int HalfSpeed  = 4;
+    static int   sCurX           = 0;
+    static int   sCurY           = 0;
+    static float sCurWidthI      = 0.0;
+    static float sCurHeightI     = 0.0;
+    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -92,13 +97,27 @@ namespace IsolationMode {
     JetsonData::ClassIdType ourBall = CurConfig::getOurTeamBallColor();
 
     // Get latest info on the target
+    // TBD: Need to use red/blue appropriately based on team color
     getBoxDataBallRedOutOfGoal(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      //Cpm::coastAllWheels();
+    if (hasTarget) {
+      sCurX          = curX;
+      sCurY          = curY;
+      sCurWidthI     = curWidthI;
+      sCurHeightI    = curHeightI;
+      sCurDepthI     = curDepthI;
     }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+    else {
+      dbgLeftRight = 0;    // no valid target
+      // Use last position for everything except depth
+      curX           = sCurX;
+      curY           = sCurY;
+      curWidthI      = sCurWidthI;
+      curHeightI     = sCurHeightI;
+      curDepthI      = 1.0;
+    }
+
+    if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
       dbgLeftRight = 1;    // Left
@@ -129,7 +148,10 @@ namespace IsolationMode {
       dbgLeftRight = 2;    // Right
     }
     else {  // Target is centered in the view
-      sCurState = nextState;
+      if (hasTarget) {
+        // Only do this if we are operating on valid data
+        sCurState = nextState;
+      }
     }
     updateJetsonDisplayLr(dbgLeftRight);
 
@@ -143,6 +165,11 @@ namespace IsolationMode {
   void centerOnGoal(StateMachineType nextState) {
     const int MaxSpeed   = 7;
     const int HalfSpeed  = 4;
+    static int   sCurX           = 0;
+    static int   sCurY           = 0;
+    static float sCurWidthI      = 0.0;
+    static float sCurHeightI     = 0.0;
+    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -154,11 +181,24 @@ namespace IsolationMode {
     // Get latest info on the target
     getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      //Cpm::coastAllWheels();
+    if (hasTarget) {
+      sCurX          = curX;
+      sCurY          = curY;
+      sCurWidthI     = curWidthI;
+      sCurHeightI    = curHeightI;
+      sCurDepthI     = curDepthI;
     }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+    else {
+      dbgLeftRight = 0;    // no valid target
+      // Use last position for everything except depth
+      curX           = sCurX;
+      curY           = sCurY;
+      curWidthI      = sCurWidthI;
+      curHeightI     = sCurHeightI;
+      curDepthI      = 1.0;
+    }
+
+    if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
       dbgLeftRight = 1;    // Left
@@ -189,7 +229,10 @@ namespace IsolationMode {
       dbgLeftRight = 2;    // Right
     }
     else {  // Target is centered in the view
-      sCurState = nextState;
+      if (hasTarget) {
+        // Only do this if we are operating on valid data
+        sCurState = nextState;
+      }
     }
     updateJetsonDisplayLr(dbgLeftRight);
 
@@ -275,6 +318,11 @@ namespace IsolationMode {
   }
 
   void performStateTowerOneTargetTrackToIt() {
+    static int   sCurX           = 0;
+    static int   sCurY           = 0;
+    static float sCurWidthI      = 0.0;
+    static float sCurHeightI     = 0.0;
+    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -285,19 +333,33 @@ namespace IsolationMode {
     JetsonData::ClassIdType ourBall = CurConfig::getOurTeamBallColor();
 
     // Get latest info on the target
+    // TBD: Need to use red/blue appropriately based on team color
     getBoxDataBallRedOutOfGoal(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    //if (hasTarget == false) {
-      //dbgLeftRight = 0;    // no valid target
-      ////Cpm::coastAllWheels();
-    //}
-    //else if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
+    if (hasTarget) {
+      sCurX          = curX;
+      sCurY          = curY;
+      sCurWidthI     = curWidthI;
+      sCurHeightI    = curHeightI;
+      sCurDepthI     = curDepthI;
+    }
+    else {
+      dbgLeftRight = 0;    // no valid target
+      // Use last position for everything except depth
+      curX           = sCurX;
+      curY           = sCurY;
+      curWidthI      = sCurWidthI;
+      curHeightI     = sCurHeightI;
+      curDepthI      = 1.0;
+    }
+
+    if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
       // Target is no longer centered, go back and center it
-      //Cpm::stopAllWheels();
-      //vex::task::sleep(100);
-      //sCurState = STATE_TOWER_ONE_TARGET_GET_CENTERED;
-    //}
-    //else {  // Here the robot is pointed at the target, move forward to target
+      Cpm::stopAllWheels();
+      vex::task::sleep(100);
+      sCurState = STATE_TOWER_ONE_TARGET_GET_CENTERED;
+    }
+    else {  // Here the robot is pointed at the target, move forward to target
       if (curDepthI >= 30) {
         sLeftMotorSpeed = 40;
         sRightMotorSpeed = 40;
@@ -309,11 +371,14 @@ namespace IsolationMode {
       else {
         sLeftMotorSpeed = 20;
         sRightMotorSpeed = 20;
-        Cpm::startBottomIntakes();
-        Cpm::startMiddleIntake();
-        sCurState = STATE_TOWER_ONE_TARGET_IN_RANGE;
+        if (hasTarget) {
+          // Only do this if we are operating on valid data
+          Cpm::startBottomIntakes();
+          Cpm::startMiddleIntake();
+          sCurState = STATE_TOWER_ONE_TARGET_IN_RANGE;
+        }
       }
-    //}
+    }
     updateJetsonDisplayLr(dbgLeftRight);
 
     // Move wheels based on trackloop positions
@@ -359,6 +424,11 @@ namespace IsolationMode {
   }
 
   void performStateTowerOneGoalTrackToIt() {
+    static int   sCurX           = 0;
+    static int   sCurY           = 0;
+    static float sCurWidthI      = 0.0;
+    static float sCurHeightI     = 0.0;
+    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -370,19 +440,30 @@ namespace IsolationMode {
     // Get latest info on the target
     getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-#if 0
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      //Cpm::coastAllWheels();
+    if (hasTarget) {
+      sCurX          = curX;
+      sCurY          = curY;
+      sCurWidthI     = curWidthI;
+      sCurHeightI    = curHeightI;
+      sCurDepthI     = curDepthI;
     }
-    else if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
+    else {
+      dbgLeftRight = 0;    // no valid target
+      // Use last position for everything except depth
+      curX           = sCurX;
+      curY           = sCurY;
+      curWidthI      = sCurWidthI;
+      curHeightI     = sCurHeightI;
+      curDepthI      = 1.0;
+    }
+
+    if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
       // Target is no longer centered, go back and center it
       Cpm::stopAllWheels();
       vex::task::sleep(100);
       sCurState = STATE_TOWER_ONE_GOAL_GET_CENTERED;
     }
     else {
-#endif
       // Here the robot is pointed at the target, move forward to target
       if (curDepthI >= 30) {
         sLeftMotorSpeed = 30;
@@ -395,10 +476,13 @@ namespace IsolationMode {
       else {
         sLeftMotorSpeed = 20;
         sRightMotorSpeed = 20;
-        Cpm::startBottomIntakes();
-        sCurState = STATE_TOWER_ONE_GOAL_IN_RANGE;
+        if (hasTarget) {
+          // Only do this if we are operating on valid data
+          Cpm::startBottomIntakes();
+          sCurState = STATE_TOWER_ONE_GOAL_IN_RANGE;
+        }
       }
-    //}
+    }
     updateJetsonDisplayLr(dbgLeftRight);
 
     // Move wheels based on trackloop positions
@@ -425,6 +509,7 @@ namespace IsolationMode {
     }
 
     if ((Cpm::wasBumperSwitchPressed() == true) || (Cpm::wasLimitSwitchPressed() == true)) {
+      // We are at the tower, shoot the balls into the goal, and hang on to the one opponent ball
       Cpm::disableLimitSwitch();
       Cpm::disableBumperSwitch();
       Cpm::stopAllWheels();
@@ -433,7 +518,7 @@ namespace IsolationMode {
       Cpm::stopBottomIntakes();
       vex::task::sleep(3000);
       Cpm::stopAllMotors();
-      sCurState = STATE_TOWER_TWO_GOAL_ENTRY;
+      sCurState = STATE_TOWER_ONE_BACKUP_TURN_OUTAKE;
     }
     else {
       if (sMoveForward == true) {

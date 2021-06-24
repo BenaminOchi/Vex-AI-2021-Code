@@ -13,6 +13,7 @@ namespace CurConfig {
   // Displays the current version and configuration to the brain screen
   void displayConfigBrain();
 
+  JetsonData::ClassIdType getOpponentTeamBallColor();
   JetsonData::ClassIdType getOurTeamBallColor();
 
   // Initialize the configuration
