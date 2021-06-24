@@ -7,11 +7,11 @@ namespace Cpm {
   static bool sBumperSwitchPressed = false;
 
   void stopAllMotors() {
-    stopWheels();
+    stopAllWheels();
     stopAllIntakes();
   }
   
-  void stopWheels() {
+  void stopAllWheels() {
     hwMotorWheelFrontLeft.stop();
     hwMotorWheelFrontRight.stop();
     hwMotorWheelBackLeft.stop();
@@ -32,7 +32,7 @@ namespace Cpm {
     hwMotorWheelBackRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
     
-    stopWheels();
+    stopAllWheels();
   }
 
   void moveRobotForward(unsigned int numInches) {
@@ -46,7 +46,7 @@ namespace Cpm {
     hwMotorWheelBackRight.spin(vex::directionType::fwd, motorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
     
-    stopWheels();
+    stopAllWheels();
   }
 
   void startWheels() {
@@ -75,7 +75,7 @@ namespace Cpm {
 
     //while ((hwMotorWheelFrontLeft.position(degrees) < rotationsInDegrees) || (hwMotorWheelBackLeft.position(degrees) < rotationsInDegrees)) {
     //}
-    stopWheels();
+    stopAllWheels();
   }
 
   void turnRobotRight(unsigned int numDegrees) {
@@ -89,7 +89,7 @@ namespace Cpm {
     hwMotorWheelBackRight.spin(vex::directionType::rev, rightMotorSpeed, vex::velocityUnits::pct);
     vex::task::sleep(numMillisecs);
 
-    stopWheels();
+    stopAllWheels();
   }
 
   void startAllIntakes() {
@@ -171,8 +171,17 @@ namespace Cpm {
     sLimitSwitchPressed = true;
   }
 
-  void clearLimitSwitchPressed() {
+  void dummyLimitSwitchPressed() {
+    // Do nothing
+  }
+
+  void disableLimitSwitch() {
+    hwLimit.pressed(Cpm::dummyLimitSwitchPressed);
     sLimitSwitchPressed = false;
+  }
+
+  void enableLimitSwitch() {
+    hwLimit.pressed(Cpm::setLimitSwitchPressed);
   }
 
   bool wasBumperSwitchPressed() {
@@ -183,11 +192,20 @@ namespace Cpm {
     sBumperSwitchPressed = true;
   }
 
-  void clearBumperSwitchPressed() {
+  void dummyBumperSwitchPressed() {
+    // Do nothing
+  }
+
+  void disableBumperSwitch() {
+    hwBumper.pressed(Cpm::dummyBumperSwitchPressed);
     sBumperSwitchPressed = false;
   }
 
-  void coastWheels() {
+  void enableBumperSwitch() {
+    hwBumper.pressed(Cpm::setBumperSwitchPressed);
+  }
+
+  void coastAllWheels() {
     hwMotorWheelFrontLeft.setStopping(vex::brakeType::coast);
     hwMotorWheelBackLeft.setStopping(vex::brakeType::coast);
     hwMotorWheelFrontRight.setStopping(vex::brakeType::coast);
@@ -195,8 +213,8 @@ namespace Cpm {
   }
 
   void stopWithCoast(int numMillisecs) {
-    coastWheels();
+    coastAllWheels();
     vex::task::sleep(numMillisecs);
-    stopWheels();
+    stopAllWheels();
   }
 }
