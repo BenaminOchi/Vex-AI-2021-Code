@@ -74,7 +74,7 @@ namespace InteractiveMode {
       if (hasTarget == false) {
     	dbgLeftRight = 0;    // no valid target
         if (sIsTargetInRange == false) {
-          Cpm::coastWheels();
+          Cpm::coastAllWheels();
         }
         else {
           hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
@@ -153,7 +153,7 @@ namespace InteractiveMode {
       sCurState = STATE_TRACK_FIRST_TARGET;
       break;
     case STATE_TRACK_FIRST_TARGET :
-      Cpm::clearLimitSwitchPressed();
+      Cpm::disableLimitSwitch();
       performStateTrackFirstTarget();
       break;
     default :

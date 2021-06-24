@@ -8,7 +8,7 @@ extern void updateJetsonDisplayLr(int lr);
 
 static const char* sBuildDate = __DATE__;
 static const char* sBuildTime = __TIME__;
-static const char* sVersion = "0002";
+static const char* sVersion = "0003";
 
 
 namespace IsolationMode {
@@ -16,14 +16,20 @@ namespace IsolationMode {
   enum StateMachineType {
     STATE_UNUSED,
     STATE_INIT,
-    STATE_TRACK_FIRST_TARGET,
-    STATE_TRACK_FIRST_TARGET_IN_RANGE,
-    STATE_BACK_UP_AND_OUTAKE,
-    STATE_TRACK_FIRST_GOAL,
-    STATE_TRACK_FIRST_GOAL_IN_RANGE,
-    STATE_BACK_UP_AND_TURN,
-    STATE_TRACK_SECOND_GOAL,
-    STATE_TRACK_SECOND_GOAL_IN_RANGE,
+    STATE_TOWER_ONE_TARGET_ENTRY,
+    STATE_TOWER_ONE_TARGET_GET_CENTERED,
+    STATE_TOWER_ONE_TARGET_TRACK_TO_IT,
+    STATE_TOWER_ONE_TARGET_IN_RANGE,
+    STATE_TOWER_ONE_BACKUP_AND_OUTAKE,
+    STATE_TOWER_ONE_GOAL_GET_CENTERED,
+    STATE_TOWER_ONE_GOAL_TRACK_TO_IT,
+    STATE_TOWER_ONE_GOAL_IN_RANGE,
+    STATE_TOWER_ONE_BACKUP_TURN_OUTAKE,
+    STATE_TOWER_TWO_GOAL_ENTRY,
+    STATE_TOWER_TWO_GOAL_GET_CENTERED,
+    STATE_TOWER_TWO_GOAL_TRACK_TO_IT,
+    STATE_TOWER_TWO_GOAL_IN_RANGE,
+    STATE_TOWER_TWO_BACKUP_TURN_OUTAKE,
     STATE_DONE
   };
 
@@ -51,234 +57,192 @@ namespace IsolationMode {
 	return sVersion;
   }
 
-  void performStateBackUpAndOutake() {
-    Cpm::startTopIntakesReverse();
-    vex::task::sleep(500);
-    Cpm::stopTopIntakes();
-    Cpm::moveRobotBackward(24);
-    vex::task::sleep(1000);
+  void printStateMachineDebug() {
+    static StateMachineType sLastDisplayedState = STATE_INIT;
+    int lastClassId = JetsonData::getLastJetsonClassId();
+  
+    if (sLastDisplayedState != sCurState) {
+      hwBrain.Screen.print("  SM-%d  CI-%d", sCurState, lastClassId);
+      hwBrain.Screen.newLine();
+      sLastDisplayedState = sCurState;
+    }
   }
 
-  void performStateBackUpAndTurn() {
-    Cpm::moveRobotBackward(24);
-    vex::task::sleep(10);
-    Cpm::turnRobotRight(45);
-    Cpm::startAllIntakesReverse();
-    vex::task::sleep(1000);
-    Cpm::stopAllIntakes();
-    Cpm::turnRobotLeft(135);
+  void printDebug(const char* dbgStr) {
+    hwBrain.Screen.print(dbgStr);
+    hwBrain.Screen.newLine();
   }
 
+
+
+
+  //-----------------------------------------------------------------------------
+  //--- Common routines
+  //-----------------------------------------------------------------------------
+  void centerOnTarget(StateMachineType nextState) {
+    const int MaxSpeed   = 7;
+    const int HalfSpeed  = 4;
+    bool  hasTarget      = false;
+    int   curX           = 0;
+    int   curY           = 0;
+    float curWidthI      = 0.0;
+    float curHeightI     = 0.0;
+    float curDepthI      = 0.0;
+    int dbgLeftRight = 3;  // Default to: pointing at target
+    JetsonData::ClassIdType ourBall = CurConfig::getOurTeamBallColor();
+
+    // Get latest info on the target
+    getBoxDataBallRedOutOfGoal(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+
+    if (hasTarget == false) {
+      dbgLeftRight = 0;    // no valid target
+      //Cpm::coastAllWheels();
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+      sLeftMotorSpeed = MaxSpeed * -1;
+      sRightMotorSpeed = MaxSpeed;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForMaxSpeed)) {
+      sLeftMotorSpeed = MaxSpeed;
+      sRightMotorSpeed = MaxSpeed * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForHalfSpeed)) {
+      sLeftMotorSpeed = HalfSpeed *  -1;
+      sLeftMotorSpeed = HalfSpeed;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForHalfSpeed)) {
+      sLeftMotorSpeed = HalfSpeed;
+      sRightMotorSpeed = HalfSpeed * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) {
+      sLeftMotorSpeed = 2 *  -1;
+      sLeftMotorSpeed = 2;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed)) {
+      sLeftMotorSpeed = 2;
+      sRightMotorSpeed = 2 * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else {  // Target is centered in the view
+      sCurState = nextState;
+    }
+    updateJetsonDisplayLr(dbgLeftRight);
+
+    // Move wheels based on trackloop positions
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+  }
+
+  void centerOnGoal(StateMachineType nextState) {
+    const int MaxSpeed   = 7;
+    const int HalfSpeed  = 4;
+    bool  hasTarget      = false;
+    int   curX           = 0;
+    int   curY           = 0;
+    float curWidthI      = 0.0;
+    float curHeightI     = 0.0;
+    float curDepthI      = 0.0;
+    int dbgLeftRight = 3;  // Default to: pointing at target
+
+    // Get latest info on the target
+    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+
+    if (hasTarget == false) {
+      dbgLeftRight = 0;    // no valid target
+      //Cpm::coastAllWheels();
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+      sLeftMotorSpeed = MaxSpeed * -1;
+      sRightMotorSpeed = MaxSpeed;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForMaxSpeed)) {
+      sLeftMotorSpeed = MaxSpeed;
+      sRightMotorSpeed = MaxSpeed * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForHalfSpeed)) {
+      sLeftMotorSpeed = HalfSpeed *  -1;
+      sLeftMotorSpeed = HalfSpeed;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForHalfSpeed)) {
+      sLeftMotorSpeed = HalfSpeed;
+      sRightMotorSpeed = HalfSpeed * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) {
+      sLeftMotorSpeed = 2 *  -1;
+      sLeftMotorSpeed = 2;
+      dbgLeftRight = 1;    // Left
+    }
+    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed)) {
+      sLeftMotorSpeed = 2;
+      sRightMotorSpeed = 2 * -1;
+      dbgLeftRight = 2;    // Right
+    }
+    else {  // Target is centered in the view
+      sCurState = nextState;
+    }
+    updateJetsonDisplayLr(dbgLeftRight);
+
+    // Move wheels based on trackloop positions
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+  }
+
+  //-----------------------------------------------------------------------------
+  //--- State Machine Init
+  //-----------------------------------------------------------------------------
   void performStateInit() {
-    Cpm::moveRobotForward(24);
-    vex::task::sleep(200);
-    Cpm::turnRobotLeft(135);
-    //Cpm::turnRobotRight(135);
+    // Nothing to do here for now
+    sCurState = STATE_TOWER_ONE_TARGET_ENTRY;
   }
 
-  void performStateTrackFirstGoal() {
-    const int MaxSpeed   = 7;
-    const int HalfSpeed  = 4;
-    bool  hasTarget      = false;
-    int   curX           = 0;
-    int   curY           = 0;
-    float curWidthI      = 0.0;
-    float curHeightI     = 0.0;
-    float curDepthI      = 0.0;
-    int dbgLeftRight = 3;  // Default to: pointing at target
-    static bool sRanOnce = false;
 
-    if (sRanOnce == false) {
-      //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL");
-      //hwBrain.Screen.newLine();
-      //Cpm::clearLimitSwitchPressed();
-      //Cpm::clearBumperSwitchPressed();
-      sRanOnce = true;
-    }
 
-    // Get latest info on the target
-    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
-
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      Cpm::coastWheels();
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed * -1;
-      sRightMotorSpeed = MaxSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed;
-      sRightMotorSpeed = MaxSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed *  -1;
-      sLeftMotorSpeed = HalfSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed;
-      sRightMotorSpeed = HalfSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else {
-      // Here the robot is pointed at the target, move forward to target
-      if (curDepthI >= 30) {
-        sLeftMotorSpeed = 40;
-        sRightMotorSpeed = 40;
-      }
-      else if (curDepthI >= 8) {
-        sLeftMotorSpeed = 30;
-        sRightMotorSpeed = 30;
-      }
-      else {
-        sLeftMotorSpeed = 20;   // TBD
-        sRightMotorSpeed = 20;  // TBD
-        Cpm::startBottomIntakes();
-        sCurState = STATE_TRACK_FIRST_GOAL_IN_RANGE;
-      }
-    }
-    updateJetsonDisplayLr(dbgLeftRight);
-
-    // Move wheels based on trackloop positions
-    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+  //-----------------------------------------------------------------------------
+  //--- Tower Two
+  //-----------------------------------------------------------------------------
+  void performStateTowerTwoGoalEntry() {
+    // TBD - Finish
   }
 
-  void performStateTrackFirstGoalInRange() {
+  void performStateTowerTwoGoalGetCentered() {
+    centerOnGoal(STATE_TOWER_TWO_GOAL_IN_RANGE);
+  }
+
+  void performStateTowerTwoGoalTrackToIt() {
+    // TBD - Finish
+  }
+  
+  void performStateTowerTwoGoalInRange() {
     static bool sMoveForward = true;
     static bool sRanOnce = false;
 
     if (sRanOnce == false) {
-      //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL_IN_RANGE");
-      //hwBrain.Screen.newLine();
-      //Cpm::clearLimitSwitchPressed();
-      Cpm::clearBumperSwitchPressed();
+      //Cpm::disableLimitSwitch();
+      Cpm::disableBumperSwitch();
       sRanOnce = true;
     }
 
     if (sMoveForward == true) {
-      //hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
-      hwBumper.pressed(Cpm::setBumperSwitchPressed);  // TBD - Use Cpm
+      //Cpm::enableLimitSwitch();
+      Cpm::enableBumperSwitch();
       sMoveForward = false;
     }
 
     if (Cpm::wasBumperSwitchPressed() == true) {
-      Cpm::stopWheels();
-      Cpm::startAllIntakes();
-      vex::task::sleep(1000);
-      vex::task::sleep(3000);
-      Cpm::stopAllMotors();
-      sCurState = STATE_BACK_UP_AND_TURN;
-    }
-    else {
-      if (sMoveForward == true) {
-        // Move wheels based on trackloop positions
-        hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-      }
-    }
-  }
-
-  void performStateTrackSecondGoal() {
-    const int MaxSpeed   = 7;
-    const int HalfSpeed  = 4;
-    bool  hasTarget      = false;
-    int   curX           = 0;
-    int   curY           = 0;
-    float curWidthI      = 0.0;
-    float curHeightI     = 0.0;
-    float curDepthI      = 0.0;
-    int dbgLeftRight = 3;  // Default to: pointing at target
-    static bool sRanOnce = false;
-
-    if (sRanOnce == false) {
-      //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL");
-      //hwBrain.Screen.newLine();
-      //Cpm::clearLimitSwitchPressed();
-      //Cpm::clearBumperSwitchPressed();
-      sRanOnce = true;
-    }
-
-    // Get latest info on the target
-    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
-
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      Cpm::coastWheels();
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed * -1;
-      sRightMotorSpeed = MaxSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed;
-      sRightMotorSpeed = MaxSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed *  -1;
-      sLeftMotorSpeed = HalfSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed;
-      sRightMotorSpeed = HalfSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else {
-      // Here the robot is pointed at the target, move forward to target
-      if (curDepthI >= 30) {
-        sLeftMotorSpeed = 40;
-        sRightMotorSpeed = 40;
-      }
-      else if (curDepthI >= 8) {
-        sLeftMotorSpeed = 30;
-        sRightMotorSpeed = 30;
-      }
-      else {
-        sLeftMotorSpeed = 20;   // TBD
-        sRightMotorSpeed = 20;  // TBD
-        Cpm::startBottomIntakes();
-        sCurState = STATE_TRACK_SECOND_GOAL_IN_RANGE;
-      }
-    }
-    updateJetsonDisplayLr(dbgLeftRight);
-
-    // Move wheels based on trackloop positions
-    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-  }
-
-  void performStateTrackSecondGoalInRange() {
-    static bool sMoveForward = true;
-    static bool sRanOnce = false;
-
-    if (sRanOnce == false) {
-      //hwBrain.Screen.print("STATE_TRACK_FIRST_GOAL_IN_RANGE");
-      //hwBrain.Screen.newLine();
-      //Cpm::clearLimitSwitchPressed();
-      Cpm::clearBumperSwitchPressed();
-      sRanOnce = true;
-    }
-
-    if (sMoveForward == true) {
-      //hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
-      hwBumper.pressed(Cpm::setBumperSwitchPressed);  // TBD - Use Cpm
-      sMoveForward = false;
-    }
-
-    if (Cpm::wasBumperSwitchPressed() == true) {
-      Cpm::stopWheels();
+      Cpm::stopAllWheels();
       Cpm::startAllIntakes();
       vex::task::sleep(5000);
       Cpm::stopAllMotors();
@@ -295,9 +259,22 @@ namespace IsolationMode {
     }
   }
 
-  void performStateTrackFirstTarget() {
-    const int MaxSpeed   = 7;
-    const int HalfSpeed  = 4;
+
+  //-----------------------------------------------------------------------------
+  //--- Tower One
+  //-----------------------------------------------------------------------------
+  void performStateTowerOneTargetEntry() {
+    Cpm::moveRobotForward(24);
+    vex::task::sleep(200);
+    Cpm::turnRobotLeft(135);
+    sCurState = STATE_TOWER_ONE_TARGET_GET_CENTERED;
+  }
+
+  void performStateTowerOneTargetGetCentered() {
+    centerOnTarget(STATE_TOWER_ONE_TARGET_TRACK_TO_IT);
+  }
+
+  void performStateTowerOneTargetTrackToIt() {
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -308,34 +285,19 @@ namespace IsolationMode {
     JetsonData::ClassIdType ourBall = CurConfig::getOurTeamBallColor();
 
     // Get latest info on the target
-    getBoxData(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+    getBoxDataBallRedOutOfGoal(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget == false) {
-      dbgLeftRight = 0;    // no valid target
-      Cpm::coastWheels();
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed * -1;
-      sRightMotorSpeed = MaxSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForMaxSpeed)) {
-      sLeftMotorSpeed = MaxSpeed;
-      sRightMotorSpeed = MaxSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed *  -1;
-      sLeftMotorSpeed = HalfSpeed;
-      dbgLeftRight = 1;    // Left
-    }
-    else if (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForHalfSpeed)) {
-      sLeftMotorSpeed = HalfSpeed;
-      sRightMotorSpeed = HalfSpeed * -1;
-      dbgLeftRight = 2;    // Right
-    }
-    else {
-      // Here the robot is pointed at the target, move forward to target
+    //if (hasTarget == false) {
+      //dbgLeftRight = 0;    // no valid target
+      ////Cpm::coastAllWheels();
+    //}
+    //else if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
+      // Target is no longer centered, go back and center it
+      //Cpm::stopAllWheels();
+      //vex::task::sleep(100);
+      //sCurState = STATE_TOWER_ONE_TARGET_GET_CENTERED;
+    //}
+    //else {  // Here the robot is pointed at the target, move forward to target
       if (curDepthI >= 30) {
         sLeftMotorSpeed = 40;
         sRightMotorSpeed = 40;
@@ -349,9 +311,9 @@ namespace IsolationMode {
         sRightMotorSpeed = 20;
         Cpm::startBottomIntakes();
         Cpm::startMiddleIntake();
-        sCurState = STATE_TRACK_FIRST_TARGET_IN_RANGE;
+        sCurState = STATE_TOWER_ONE_TARGET_IN_RANGE;
       }
-    }
+    //}
     updateJetsonDisplayLr(dbgLeftRight);
 
     // Move wheels based on trackloop positions
@@ -361,27 +323,25 @@ namespace IsolationMode {
     hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
   }
 
-  void performStateTrackFirstTargetInRange() {
+  void performStateTowerOneTargetInRange() {
     static bool sMoveForward = true;
     static bool sRanOnce = false;
 
     if (sRanOnce == false) {
-      //hwBrain.Screen.print("STATE_TRACK_FIRST_TARGET_IN_RANGE");
-      //hwBrain.Screen.newLine();
-      Cpm::clearLimitSwitchPressed();
-      Cpm::clearBumperSwitchPressed();
+      Cpm::disableLimitSwitch();
+      Cpm::disableBumperSwitch();
       sRanOnce = true;
     }
 
     if (sMoveForward == true) {
-      hwLimit.pressed(Cpm::setLimitSwitchPressed);    // TBD - Use Cpm
-      hwBumper.pressed(Cpm::setBumperSwitchPressed);  // TBD - Use Cpm
+      Cpm::enableLimitSwitch();
+      Cpm::enableBumperSwitch();
       sMoveForward = false;
     }
 
     if ((Cpm::wasLimitSwitchPressed() == true) || (Cpm::wasBumperSwitchPressed() == true)) {
       Cpm::stopAllMotors();
-      sCurState = STATE_BACK_UP_AND_OUTAKE;
+      sCurState = STATE_TOWER_ONE_BACKUP_AND_OUTAKE;
     }
     else {
       if (sMoveForward == true) {
@@ -394,49 +354,160 @@ namespace IsolationMode {
     }
   }
 
-  void runStateMachine() {
-    switch (sCurState) {
-    case STATE_INIT :
-      performStateInit();
-      sCurState = STATE_TRACK_FIRST_TARGET;
-      break;
-    case STATE_TRACK_FIRST_TARGET :
-      performStateTrackFirstTarget();
-      break;
-    case STATE_TRACK_FIRST_TARGET_IN_RANGE :
-      performStateTrackFirstTargetInRange();
-      break;
-    case STATE_BACK_UP_AND_OUTAKE :
-      performStateBackUpAndOutake();
-      sCurState = STATE_TRACK_FIRST_GOAL;
-      break;
-    case STATE_TRACK_FIRST_GOAL :
-      performStateTrackFirstGoal();
-      break;
-    case STATE_TRACK_FIRST_GOAL_IN_RANGE :
-      performStateTrackFirstGoalInRange();
-      break;
-    case STATE_BACK_UP_AND_TURN :
-      performStateBackUpAndTurn();
-      sCurState = STATE_TRACK_SECOND_GOAL;
-    case STATE_TRACK_SECOND_GOAL :
-      performStateTrackSecondGoal();
-    case STATE_TRACK_SECOND_GOAL_IN_RANGE:
-      performStateTrackSecondGoalInRange();
-      break;
-    case STATE_DONE :
-      Cpm::clearLimitSwitchPressed();
-      Cpm::clearBumperSwitchPressed();
+  void performStateTowerOneGoalGetCentered() {
+    centerOnGoal(STATE_TOWER_ONE_GOAL_TRACK_TO_IT);
+  }
+
+  void performStateTowerOneGoalTrackToIt() {
+    bool  hasTarget      = false;
+    int   curX           = 0;
+    int   curY           = 0;
+    float curWidthI      = 0.0;
+    float curHeightI     = 0.0;
+    float curDepthI      = 0.0;
+    int dbgLeftRight = 3;  // Default to: pointing at target
+
+    // Get latest info on the target
+    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+
+#if 0
+    if (hasTarget == false) {
+      dbgLeftRight = 0;    // no valid target
+      //Cpm::coastAllWheels();
+    }
+    else if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
+      // Target is no longer centered, go back and center it
+      Cpm::stopAllWheels();
+      vex::task::sleep(100);
+      sCurState = STATE_TOWER_ONE_GOAL_GET_CENTERED;
+    }
+    else {
+#endif
+      // Here the robot is pointed at the target, move forward to target
+      if (curDepthI >= 30) {
+        sLeftMotorSpeed = 30;
+        sRightMotorSpeed = 30;
+      }
+      else if (curDepthI >= 16) {
+        sLeftMotorSpeed = 20;
+        sRightMotorSpeed = 20;
+      }
+      else {
+        sLeftMotorSpeed = 20;
+        sRightMotorSpeed = 20;
+        Cpm::startBottomIntakes();
+        sCurState = STATE_TOWER_ONE_GOAL_IN_RANGE;
+      }
+    //}
+    updateJetsonDisplayLr(dbgLeftRight);
+
+    // Move wheels based on trackloop positions
+    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+  }
+
+  void performStateTowerOneGoalInRange() {
+    static bool sMoveForward = true;
+    static bool sRanOnce = false;
+
+    if (sRanOnce == false) {
+      Cpm::disableLimitSwitch();
+      Cpm::disableBumperSwitch();
+      sRanOnce = true;
+    }
+
+    if (sMoveForward == true) {
+      Cpm::enableLimitSwitch();
+      Cpm::enableBumperSwitch();
+      sMoveForward = false;
+    }
+
+    if ((Cpm::wasBumperSwitchPressed() == true) || (Cpm::wasLimitSwitchPressed() == true)) {
+      Cpm::disableLimitSwitch();
+      Cpm::disableBumperSwitch();
+      Cpm::stopAllWheels();
+      Cpm::startAllIntakes();
+      vex::task::sleep(1000);
+      Cpm::stopBottomIntakes();
+      vex::task::sleep(3000);
       Cpm::stopAllMotors();
-      break;
-    default :
-      break;
+      sCurState = STATE_TOWER_TWO_GOAL_ENTRY;
+    }
+    else {
+      if (sMoveForward == true) {
+        // Move wheels based on trackloop positions
+        hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+        hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+        hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
+        hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
+      }
     }
   }
 
-  //-----------------------
-  // Isolation mode event loop
-  //-----------------------
+  void performStateTowerOneBackupAndOutake() {
+    Cpm::startTopIntakesReverse();
+    vex::task::sleep(500);
+    Cpm::stopTopIntakes();
+    Cpm::moveRobotBackward(24);
+    vex::task::sleep(1000);
+    sCurState = STATE_TOWER_ONE_GOAL_GET_CENTERED;
+  }
+
+  void performStateTowerOneBackupTurnOutake() {
+    Cpm::moveRobotBackward(24);
+    vex::task::sleep(10);
+    Cpm::turnRobotRight(45);
+    Cpm::startAllIntakesReverse();
+    vex::task::sleep(1000);
+    Cpm::stopAllIntakes();
+    Cpm::turnRobotLeft(180);
+    sCurState = STATE_TOWER_TWO_GOAL_ENTRY;
+  }
+
+
+  //-----------------------------------------------------------------------------
+  //--- Done with Isolation
+  //-----------------------------------------------------------------------------
+  void performStateDone() {
+    Cpm::disableLimitSwitch();
+    Cpm::disableBumperSwitch();
+    Cpm::stopAllMotors();
+  }
+
+
+
+  //-----------------------------------------------------------------------------
+  //--- State Machine
+  //-----------------------------------------------------------------------------
+  void runStateMachine() {
+    printStateMachineDebug();
+
+    switch (sCurState) {
+    case STATE_INIT                            :  performStateInit();                        break;
+    case STATE_TOWER_ONE_TARGET_ENTRY          :  performStateTowerOneTargetEntry();         break;
+    case STATE_TOWER_ONE_TARGET_GET_CENTERED   :  performStateTowerOneTargetGetCentered();   break;
+    case STATE_TOWER_ONE_TARGET_TRACK_TO_IT    :  performStateTowerOneTargetTrackToIt();     break;
+    case STATE_TOWER_ONE_TARGET_IN_RANGE       :  performStateTowerOneTargetInRange();       break;
+    case STATE_TOWER_ONE_BACKUP_AND_OUTAKE     :  performStateTowerOneBackupAndOutake();     break;
+    case STATE_TOWER_ONE_GOAL_GET_CENTERED     :  performStateTowerOneGoalGetCentered();     break;
+    case STATE_TOWER_ONE_GOAL_TRACK_TO_IT      :  performStateTowerOneGoalTrackToIt();       break;
+    case STATE_TOWER_ONE_GOAL_IN_RANGE         :  performStateTowerOneGoalInRange();         break;
+    case STATE_TOWER_ONE_BACKUP_TURN_OUTAKE    :  performStateTowerOneBackupTurnOutake();    break;
+    case STATE_TOWER_TWO_GOAL_ENTRY            :  performStateTowerTwoGoalEntry();           break;
+    case STATE_TOWER_TWO_GOAL_GET_CENTERED     :  performStateTowerTwoGoalGetCentered();     break;
+    case STATE_TOWER_TWO_GOAL_TRACK_TO_IT      :  performStateTowerTwoGoalTrackToIt();       break;
+    case STATE_TOWER_TWO_GOAL_IN_RANGE         :  performStateTowerTwoGoalInRange();         break;
+    case STATE_DONE                            :  performStateDone();                        break;
+    default                                    :                                             break;
+    }
+  }
+
+
+  //-----------------------------------------------------------------------------
+  //--- Isolation mode event loop
+  //-----------------------------------------------------------------------------
   int controlTask() {
 
     Cpm::stopAllMotors();
