@@ -116,105 +116,6 @@ void enterUserControl(void) {
   ManualMode::enterManualControl();
 }
 
-/*---------------------------------------------------------------------------*/
-static bool sTestSwitchPressed = false;
-
-void clearTestSwitchPressed() {
-  sTestSwitchPressed = false;
-}
-void testSwitchPressed() {
-  sTestSwitchPressed = true;
-}
-
-void testCpm() {
-  /*
-  Cpm::stopAllMotors();
-  Cpm::moveRobotForward(24);
-  vex::task::sleep(200);
-  Cpm::turnRobotLeft(135);
-  vex::task::sleep(200);
-  Cpm::moveRobotForward(500);
-  vex::task::sleep(200);
-  Cpm::moveRobotBackward(500);
-  vex::task::sleep(200);
-  Cpm::turnRobotLeft(2000);
-  vex::task::sleep(200);
-  Cpm::turnRobotRight(2000);
-  vex::task::sleep(200);
-  Cpm::startAllIntakes();
-  vex::task::sleep(500);
-  Cpm::stopAllIntakes();
-  vex::task::sleep(1000);
-  Cpm::startBottomIntakes();
-  vex::task::sleep(500);
-  Cpm::stopBottomIntakes();
-  vex::task::sleep(1000);
-  Cpm::startMiddleIntake();
-  vex::task::sleep(500);
-  Cpm::stopMiddleIntake();
-  vex::task::sleep(1000);
-  Cpm::startTopIntakes();
-  vex::task::sleep(500);
-  Cpm::stopTopIntakes();
-  */
-  bool testLimitHw = true;
-  bool testLimitCpm = true;
-  bool testBumperHw = true;
-  bool testBumperCpm = true;
-
-  if (testLimitHw) {   // Test Limit Switch using hardware
-    hwBrain.Screen.print("testLimitHw - Start");
-    hwBrain.Screen.newLine();
-    clearTestSwitchPressed();
-    hwLimit.pressed(testSwitchPressed);
-    while (sTestSwitchPressed == false) {
-      vex::task::sleep(1);
-    }
-    clearTestSwitchPressed();
-    hwBrain.Screen.print("testLimitHw - End");
-    hwBrain.Screen.newLine();
-  }
-
-  if (testLimitCpm) {   // Test Limit Switch using CPM helpers
-    hwBrain.Screen.print("testLimitCpm - Start");
-    hwBrain.Screen.newLine();
-    Cpm::disableLimitSwitch();
-    Cpm::enableLimitSwitch();
-    while (Cpm::wasLimitSwitchPressed() == false) {
-      vex::task::sleep(1);
-    }
-    Cpm::disableLimitSwitch();
-    hwBrain.Screen.print("testLimitCpm - End");
-    hwBrain.Screen.newLine();
-  }
-
-  if (testBumperHw) {   // Test Bumper Switch using hardware
-    hwBrain.Screen.print("testBumperHw - Start");
-    hwBrain.Screen.newLine();
-    clearTestSwitchPressed();
-    hwBumper.pressed(testSwitchPressed);
-    while (sTestSwitchPressed == false) {
-      vex::task::sleep(1);
-    }
-    clearTestSwitchPressed();
-    hwBrain.Screen.print("testBumperHw - End");
-    hwBrain.Screen.newLine();
-  }
-
-  if (testBumperCpm) {   // Test Bumper Switch using CPM helpers
-    hwBrain.Screen.print("testBumperCpm - Start");
-    hwBrain.Screen.newLine();
-    Cpm::disableBumperSwitch();
-    Cpm::enableBumperSwitch();
-    while (Cpm::wasBumperSwitchPressed() == false) {
-      vex::task::sleep(1);
-    }
-    Cpm::disableBumperSwitch();
-    hwBrain.Screen.print("testBumperCpm - End");
-    hwBrain.Screen.newLine();
-  }
-}
-/*---------------------------------------------------------------------------*/
 
 //
 // Main will set up the competition functions and callbacks.
@@ -236,7 +137,7 @@ int main() {
   IsolationMode::enterMain();  // TEMP for debug
   //enterUserControl();          // TEMP for debug
 
-  //testCpm();
+  //Cpm::testCpm();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

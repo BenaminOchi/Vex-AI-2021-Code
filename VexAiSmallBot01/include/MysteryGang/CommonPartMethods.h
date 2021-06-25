@@ -74,5 +74,8 @@ namespace Cpm {
 
   // Coast for a bit of time, then stop all wheels
   void stopWithCoast();
+
+  // Test for CPM methods
+  void testCpm();
 }
 #endif

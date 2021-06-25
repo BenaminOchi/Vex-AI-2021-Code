@@ -65,11 +65,10 @@ namespace InteractiveMode {
     static bool sIsTracking = true;
     static bool sIsTargetInRange = false;
     int dbgLeftRight = 3;  // Default to: pointing at target
-    JetsonData::ClassIdType ourBall = JetsonData::BALL_RED;
 
     if (sIsTracking == true) {
       // Get latest info on the target
-      getBoxData(ourBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+      JetsonData::getBoxDataOurTeamBall(JetsonData::BRTGT_DONT_CARE, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
       if (hasTarget == false) {
     	dbgLeftRight = 0;    // no valid target

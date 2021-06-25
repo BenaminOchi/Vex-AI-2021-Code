@@ -77,11 +77,6 @@ namespace IsolationMode {
   void centerOnTarget(StateMachineType nextState) {
     const int MaxSpeed   = 7;
     const int HalfSpeed  = 4;
-    static int   sCurX           = 0;
-    static int   sCurY           = 0;
-    static float sCurWidthI      = 0.0;
-    static float sCurHeightI     = 0.0;
-    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -89,30 +84,15 @@ namespace IsolationMode {
     float curHeightI     = 0.0;
     float curDepthI      = 0.0;
     int dbgLeftRight = 3;  // Default to: pointing at target
-    JetsonData::ClassIdType opponentBall = CurConfig::getOpponentTeamBallColor();
 
     // Get latest info on the target
-    // TBD: Need to use red/blue appropriately based on team color
-    getBoxDataBallBlueInsideGoal(opponentBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+    JetsonData::getBoxDataOpponentTeamBall(JetsonData::BRTGT_DONT_CARE, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget) {
-      sCurX          = curX;
-      sCurY          = curY;
-      sCurWidthI     = curWidthI;
-      sCurHeightI    = curHeightI;
-      sCurDepthI     = curDepthI;
-    }
-    else {
+    if (hasTarget == false) {
       dbgLeftRight = 0;    // no valid target
-      // Use last position for everything except depth
-      curX           = sCurX;
-      curY           = sCurY;
-      curWidthI      = sCurWidthI;
-      curHeightI     = sCurHeightI;
-      curDepthI      = 1.0;
+      Cpm::coastAllWheels();
     }
-
-    if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
       dbgLeftRight = 1;    // Left
@@ -143,10 +123,7 @@ namespace IsolationMode {
       dbgLeftRight = 2;    // Right
     }
     else {  // Target is centered in the view
-      if (hasTarget) {
-        // Only do this if we are operating on valid data
-        sCurState = nextState;
-      }
+      sCurState = nextState;
     }
     updateJetsonDisplayLr(dbgLeftRight);
 
@@ -160,11 +137,6 @@ namespace IsolationMode {
   void centerOnGoal(StateMachineType nextState) {
     const int MaxSpeed   = 7;
     const int HalfSpeed  = 4;
-    static int   sCurX           = 0;
-    static int   sCurY           = 0;
-    static float sCurWidthI      = 0.0;
-    static float sCurHeightI     = 0.0;
-    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -174,26 +146,13 @@ namespace IsolationMode {
     int dbgLeftRight = 3;  // Default to: pointing at target
 
     // Get latest info on the target
-    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+    JetsonData::getBoxDataGoal(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget) {
-      sCurX          = curX;
-      sCurY          = curY;
-      sCurWidthI     = curWidthI;
-      sCurHeightI    = curHeightI;
-      sCurDepthI     = curDepthI;
-    }
-    else {
+    if (hasTarget == false) {
       dbgLeftRight = 0;    // no valid target
-      // Use last position for everything except depth
-      curX           = sCurX;
-      curY           = sCurY;
-      curWidthI      = sCurWidthI;
-      curHeightI     = sCurHeightI;
-      curDepthI      = 1.0;
+      Cpm::coastAllWheels();
     }
-
-    if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
+    else if (curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForMaxSpeed)) {
       sLeftMotorSpeed = MaxSpeed * -1;
       sRightMotorSpeed = MaxSpeed;
       dbgLeftRight = 1;    // Left
@@ -224,10 +183,7 @@ namespace IsolationMode {
       dbgLeftRight = 2;    // Right
     }
     else {  // Target is centered in the view
-      if (hasTarget) {
-        // Only do this if we are operating on valid data
-        sCurState = nextState;
-      }
+      sCurState = nextState;
     }
     updateJetsonDisplayLr(dbgLeftRight);
 
@@ -253,9 +209,9 @@ namespace IsolationMode {
   //--- Tower One
   //-----------------------------------------------------------------------------
   void performStateTowerOneTargetEntry() {
-    Cpm::moveRobotForward(24);
+    Cpm::moveRobotForward(60);
     vex::task::sleep(200);
-    Cpm::turnRobotRight(45);
+    Cpm::turnRobotRight(80);
     sCurState = STATE_TOWER_ONE_TARGET_GET_CENTERED;
   }
 
@@ -264,11 +220,6 @@ namespace IsolationMode {
   }
 
   void performStateTowerOneTargetTrackToIt() {
-    static int   sCurX           = 0;
-    static int   sCurY           = 0;
-    static float sCurWidthI      = 0.0;
-    static float sCurHeightI     = 0.0;
-    static float sCurDepthI      = 0.0;
     bool  hasTarget      = false;
     int   curX           = 0;
     int   curY           = 0;
@@ -276,30 +227,15 @@ namespace IsolationMode {
     float curHeightI     = 0.0;
     float curDepthI      = 0.0;
     int dbgLeftRight = 3;  // Default to: pointing at target
-    JetsonData::ClassIdType opponentBall = CurConfig::getOurTeamBallColor();
 
     // Get latest info on the target
-    // TBD: Need to use red/blue appropriately based on team color
-    getBoxDataBallBlueInsideGoal(opponentBall, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
+    JetsonData::getBoxDataOpponentTeamBall(JetsonData::BRTGT_DONT_CARE, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
 
-    if (hasTarget) {
-      sCurX          = curX;
-      sCurY          = curY;
-      sCurWidthI     = curWidthI;
-      sCurHeightI    = curHeightI;
-      sCurDepthI     = curDepthI;
-    }
-    else {
+    if (hasTarget == false) {
       dbgLeftRight = 0;    // no valid target
-      // Use last position for everything except depth
-      curX           = sCurX;
-      curY           = sCurY;
-      curWidthI      = sCurWidthI;
-      curHeightI     = sCurHeightI;
-      curDepthI      = 1.0;
+      Cpm::coastAllWheels();
     }
-
-    if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
+    else if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
       // Target is no longer centered, go back and center it
       Cpm::stopAllWheels();
       vex::task::sleep(100);
@@ -320,8 +256,7 @@ namespace IsolationMode {
         if (hasTarget) {
           // Only do this if we are operating on valid data
           Cpm::startBottomIntakes();
-          //sCurState = STATE_TOWER_ONE_TARGET_IN_RANGE;
-          sCurState = STATE_DONE;   // TBD: Debug
+          sCurState = STATE_TOWER_ONE_TARGET_IN_RANGE;
         }
       }
     }
@@ -351,120 +286,12 @@ namespace IsolationMode {
     }
 
     if ((Cpm::wasLimitSwitchPressed() == true) || (Cpm::wasBumperSwitchPressed() == true)) {
-      Cpm::stopAllMotors();
-      sCurState = STATE_TOWER_ONE_BACKUP_AND_OUTAKE;
-    }
-    else {
-      if (sMoveForward == true) {
-        // Move wheels based on trackloop positions
-        hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-        hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-      }
-    }
-  }
-
-  void performStateTowerOneGoalGetCentered() {
-    centerOnGoal(STATE_TOWER_ONE_GOAL_TRACK_TO_IT);
-  }
-
-  void performStateTowerOneGoalTrackToIt() {
-    static int   sCurX           = 0;
-    static int   sCurY           = 0;
-    static float sCurWidthI      = 0.0;
-    static float sCurHeightI     = 0.0;
-    static float sCurDepthI      = 0.0;
-    bool  hasTarget      = false;
-    int   curX           = 0;
-    int   curY           = 0;
-    float curWidthI      = 0.0;
-    float curHeightI     = 0.0;
-    float curDepthI      = 0.0;
-    int dbgLeftRight = 3;  // Default to: pointing at target
-
-    // Get latest info on the target
-    getBoxData(JetsonData::GOAL, &hasTarget, &curX, &curY, &curWidthI, &curHeightI, &curDepthI);
-
-    if (hasTarget) {
-      sCurX          = curX;
-      sCurY          = curY;
-      sCurWidthI     = curWidthI;
-      sCurHeightI    = curHeightI;
-      sCurDepthI     = curDepthI;
-    }
-    else {
-      dbgLeftRight = 0;    // no valid target
-      // Use last position for everything except depth
-      curX           = sCurX;
-      curY           = sCurY;
-      curWidthI      = sCurWidthI;
-      curHeightI     = sCurHeightI;
-      curDepthI      = 1.0;
-    }
-
-    if ((curX <= (JetsonData::CenterX - JetsonData::CenterAdjustForLineOfSightSpeed)) || (curX >= (JetsonData::CenterX + JetsonData::CenterAdjustForLineOfSightSpeed))) {
-      // Target is no longer centered, go back and center it
+      // First ball was acquired
+      Cpm::moveRobotBackward(3);
       Cpm::stopAllWheels();
-      vex::task::sleep(100);
-      sCurState = STATE_TOWER_ONE_GOAL_GET_CENTERED;
-    }
-    else {
-      // Here the robot is pointed at the target, move forward to target
-      if (curDepthI >= 30) {
-        sLeftMotorSpeed = 30;
-        sRightMotorSpeed = 30;
-      }
-      else if (curDepthI >= 16) {
-        sLeftMotorSpeed = 20;
-        sRightMotorSpeed = 20;
-      }
-      else {
-        sLeftMotorSpeed = 20;
-        sRightMotorSpeed = 20;
-        if (hasTarget) {
-          // Only do this if we are operating on valid data
-          Cpm::startBottomIntakes();
-          sCurState = STATE_TOWER_ONE_GOAL_IN_RANGE;
-        }
-      }
-    }
-    updateJetsonDisplayLr(dbgLeftRight);
-
-    // Move wheels based on trackloop positions
-    hwMotorWheelFrontLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelFrontRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackLeft.spin(vex::directionType::fwd, sLeftMotorSpeed, vex::velocityUnits::pct);
-    hwMotorWheelBackRight.spin(vex::directionType::fwd, sRightMotorSpeed, vex::velocityUnits::pct);
-  }
-
-  void performStateTowerOneGoalInRange() {
-    static bool sMoveForward = true;
-    static bool sRanOnce = false;
-
-    if (sRanOnce == false) {
-      Cpm::disableLimitSwitch();
-      Cpm::disableBumperSwitch();
-      sRanOnce = true;
-    }
-
-    if (sMoveForward == true) {
-      Cpm::enableLimitSwitch();
-      Cpm::enableBumperSwitch();
-      sMoveForward = false;
-    }
-
-    if ((Cpm::wasBumperSwitchPressed() == true) || (Cpm::wasLimitSwitchPressed() == true)) {
-      // We are at the tower, shoot the balls into the goal, and hang on to the one opponent ball
-      Cpm::disableLimitSwitch();
-      Cpm::disableBumperSwitch();
-      Cpm::stopAllWheels();
-      Cpm::startAllIntakes();
-      vex::task::sleep(1000);
-      Cpm::stopBottomIntakes();
       vex::task::sleep(3000);
-      Cpm::stopAllMotors();
-      sCurState = STATE_TOWER_ONE_BACKUP_TURN_OUTAKE;
+      Cpm::stopAllIntakes();
+      sCurState = STATE_DONE;
     }
     else {
       if (sMoveForward == true) {
@@ -477,25 +304,6 @@ namespace IsolationMode {
     }
   }
 
-  void performStateTowerOneBackupAndOutake() {
-    Cpm::startTopIntakesReverse();
-    vex::task::sleep(500);
-    Cpm::stopTopIntakes();
-    Cpm::moveRobotBackward(24);
-    vex::task::sleep(1000);
-    sCurState = STATE_TOWER_ONE_GOAL_GET_CENTERED;
-  }
-
-  void performStateTowerOneBackupTurnOutake() {
-    Cpm::moveRobotBackward(24);
-    vex::task::sleep(10);
-    Cpm::turnRobotRight(45);
-    Cpm::startAllIntakesReverse();
-    vex::task::sleep(1000);
-    Cpm::stopAllIntakes();
-    Cpm::turnRobotLeft(180);
-    sCurState = STATE_DONE;
-  }
 
 
   //-----------------------------------------------------------------------------
@@ -521,11 +329,6 @@ namespace IsolationMode {
     case STATE_TOWER_ONE_TARGET_GET_CENTERED   :  performStateTowerOneTargetGetCentered();   break;
     case STATE_TOWER_ONE_TARGET_TRACK_TO_IT    :  performStateTowerOneTargetTrackToIt();     break;
     case STATE_TOWER_ONE_TARGET_IN_RANGE       :  performStateTowerOneTargetInRange();       break;
-    case STATE_TOWER_ONE_BACKUP_AND_OUTAKE     :  performStateTowerOneBackupAndOutake();     break;
-    case STATE_TOWER_ONE_GOAL_GET_CENTERED     :  performStateTowerOneGoalGetCentered();     break;
-    case STATE_TOWER_ONE_GOAL_TRACK_TO_IT      :  performStateTowerOneGoalTrackToIt();       break;
-    case STATE_TOWER_ONE_GOAL_IN_RANGE         :  performStateTowerOneGoalInRange();         break;
-    case STATE_TOWER_ONE_BACKUP_TURN_OUTAKE    :  performStateTowerOneBackupTurnOutake();    break;
     case STATE_DONE                            :  performStateDone();                        break;
     default                                    :                                             break;
     }

@@ -217,4 +217,107 @@ namespace Cpm {
     vex::task::sleep(numMillisecs);
     stopAllWheels();
   }
+
+
+
+
+  /*---------------------------------------------------------------------------*/
+  static bool sTestSwitchPressed = false;
+
+  void clearTestSwitchPressed() {
+    sTestSwitchPressed = false;
+  }
+  void testSwitchPressed() {
+    sTestSwitchPressed = true;
+  }
+
+  void testCpm() {
+    /*
+    stopAllMotors();
+    moveRobotForward(24);
+    vex::task::sleep(200);
+    turnRobotLeft(135);
+    vex::task::sleep(200);
+    moveRobotForward(500);
+    vex::task::sleep(200);
+    moveRobotBackward(500);
+    vex::task::sleep(200);
+    turnRobotLeft(2000);
+    vex::task::sleep(200);
+    turnRobotRight(2000);
+    vex::task::sleep(200);
+    startAllIntakes();
+    vex::task::sleep(500);
+    stopAllIntakes();
+    vex::task::sleep(1000);
+    startBottomIntakes();
+    vex::task::sleep(500);
+    stopBottomIntakes();
+    vex::task::sleep(1000);
+    startMiddleIntake();
+    vex::task::sleep(500);
+    stopMiddleIntake();
+    vex::task::sleep(1000);
+    startTopIntakes();
+    vex::task::sleep(500);
+    stopTopIntakes();
+    */
+    bool testLimitHw = true;
+    bool testLimitCpm = true;
+    bool testBumperHw = true;
+    bool testBumperCpm = true;
+
+    if (testLimitHw) {   // Test Limit Switch using hardware
+      hwBrain.Screen.print("testLimitHw - Start");
+      hwBrain.Screen.newLine();
+      clearTestSwitchPressed();
+      hwLimit.pressed(testSwitchPressed);
+      while (sTestSwitchPressed == false) {
+        vex::task::sleep(1);
+      }
+      clearTestSwitchPressed();
+      hwBrain.Screen.print("testLimitHw - End");
+      hwBrain.Screen.newLine();
+    }
+
+    if (testLimitCpm) {   // Test Limit Switch using CPM helpers
+      hwBrain.Screen.print("testLimitCpm - Start");
+      hwBrain.Screen.newLine();
+      Cpm::disableLimitSwitch();
+      Cpm::enableLimitSwitch();
+      while (Cpm::wasLimitSwitchPressed() == false) {
+        vex::task::sleep(1);
+      }
+      Cpm::disableLimitSwitch();
+      hwBrain.Screen.print("testLimitCpm - End");
+      hwBrain.Screen.newLine();
+    }
+
+    if (testBumperHw) {   // Test Bumper Switch using hardware
+      hwBrain.Screen.print("testBumperHw - Start");
+      hwBrain.Screen.newLine();
+      clearTestSwitchPressed();
+      hwBumper.pressed(testSwitchPressed);
+      while (sTestSwitchPressed == false) {
+        vex::task::sleep(1);
+      }
+      clearTestSwitchPressed();
+      hwBrain.Screen.print("testBumperHw - End");
+      hwBrain.Screen.newLine();
+    }
+
+    if (testBumperCpm) {   // Test Bumper Switch using CPM helpers
+      hwBrain.Screen.print("testBumperCpm - Start");
+      hwBrain.Screen.newLine();
+      Cpm::disableBumperSwitch();
+      Cpm::enableBumperSwitch();
+      while (Cpm::wasBumperSwitchPressed() == false) {
+        vex::task::sleep(1);
+      }
+      Cpm::disableBumperSwitch();
+      hwBrain.Screen.print("testBumperCpm - End");
+      hwBrain.Screen.newLine();
+    }
+  }
+
 }
